@@ -46,7 +46,7 @@ Archivos base ya presentes:
 - Configuración inicial de Pygame.
     - Archivo `main.py` que inicializa la ventana de Pygame.
     - Código basado en tutorial proporcionado por profesor (ventana, bucle principal, actualización de pantalla).
-   
+- Test en rojo de la clase Dice.
 ---
 
 ## Entorno virtual
