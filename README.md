@@ -15,8 +15,12 @@ Este proyecto implementa el juego **Backgammon** en **Python**, siguiendo las co
 El desarrollo contempla tanto una **interfaz de línea de comandos (CLI)** como una **interfaz gráfica basada en Pygame**, manteniendo la lógica de juego desacoplada de la presentación.  
 
 ---
-
+## 📌 Requisitos
+- Python 3.10+
+- Docker (para testing y ejecución)
 ## Estado actual del proyecto
+
+---
 
 ### Estructura de carpetas creada
 - `core/` → lógica del juego.
@@ -33,16 +37,19 @@ Archivos base ya presentes:
 - `JUSTIFICACION.md`
 - `requirements.txt`
 
-### ✔️ Avances realizados
+### Avances realizados
 - Estructura de tests inicial (`tests/`).
 - Prompts en curso (`prompts-desarrollo.md`, `prompts-testing.md`, `prompts-documentacion.md`).
 - Configuración de entorno virtual.
 - Configuración de coverage.
 - Test de ejemplo para validar setup.
-
+- Configuración inicial de Pygame.
+    - Archivo `main.py` que inicializa la ventana de Pygame.
+    - Código basado en tutorial proporcionado por profesor (ventana, bucle principal, actualización de pantalla).
+   
 ---
 
-## 🐍 Entorno virtual
+## Entorno virtual
 
 Para crear y activar el entorno virtual:
 
