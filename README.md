@@ -15,7 +15,7 @@ Este proyecto implementa el juego **Backgammon** en **Python**, siguiendo las co
 El desarrollo contempla tanto una **interfaz de línea de comandos (CLI)** como una **interfaz gráfica basada en Pygame**, manteniendo la lógica de juego desacoplada de la presentación.  
 
 ---
-## 📌 Requisitos
+## Requisitos
 - Python 3.10+
 - Docker (para testing y ejecución)
 ## Estado actual del proyecto
@@ -54,6 +54,7 @@ Archivos base ya presentes:
 Para crear y activar el entorno virtual:
 
 ```bash
-python3 -m venv venv  #según versión puede ser solo python sin el 3
+python3 -m venv venv  # según versión puede ser solo python sin el 3
 source venv/bin/activate   # mac/linux
+
 
