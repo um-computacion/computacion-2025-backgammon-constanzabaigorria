@@ -1,23 +1,3 @@
-## Prompt [1] 
-
-**Fecha**: 28-08-2025 
-**Modelo/Herramienta**: ChatGPT (GPT-5) 
-**Contexto**: creación de código para test de Dice
-
-## Prompt enviado
-
-crea un código de test para la clase de Dice
-
-### Respuesta recibida
-
-Los tests definidos comprueban lo siguiente:
-- Que el método `roll()` devuelva una tupla con dos valores enteros.  
-- Que los valores estén entre 1 y 6.  
-- Que se detecten correctamente los dobles con un método `is_double()`.  
-
-El código sugerido fue el siguiente:
-
-```
 import unittest
 from core.dice import Dice
 
@@ -48,6 +28,4 @@ class TestDice(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-```
-## Uso de la respuesta
-El código fue incorporado al archivo tal cual lo dió la IA, queda pendiente de revisión una vez que se cree tambien la clase Dice. Este se encuentra en rojo porque todavía no se implementó la clase Dice.
+
