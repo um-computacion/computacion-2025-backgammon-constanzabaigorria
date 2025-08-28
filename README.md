@@ -17,10 +17,10 @@ El desarrollo contempla tanto una **interfaz de línea de comandos (CLI)** como 
 ---
 ## Requisitos
 - Python 3.10+
-- Docker (para testing y ejecución)
-## Estado actual del proyecto
 
 ---
+
+## Estado actual del proyecto
 
 ### Estructura de carpetas creada
 - `core/` → lógica del juego.
