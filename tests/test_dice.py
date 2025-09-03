@@ -11,7 +11,6 @@ class TestDice(unittest.TestCase):
         self.assertIsInstance(result, list, "El resultado debe ser una lista")
 
     def test_roll_length(self):
-        # Ejecutamos varias veces para cubrir dobles y no dobles
         found_double = False
         found_normal = False
         for _ in range(100):
@@ -37,6 +36,17 @@ class TestDice(unittest.TestCase):
     def test_get_last_roll(self):
         roll = self.dice.roll()
         self.assertEqual(roll, self.dice.get_last_roll(), "get_last_roll debe devolver el último resultado")
+
+    def test_set_last_roll(self):
+        self.dice.set_last_roll([2, 5])
+        self.assertEqual(self.dice.get_last_roll(), [2, 5])
+
+    def test_get_sides(self):
+        self.assertEqual(self.dice.get_sides(), 6)
+
+    def test_set_sides(self):
+        self.dice.set_sides(12)
+        self.assertEqual(self.dice.get_sides(), 12)
 
 if __name__ == "__main__":
     unittest.main()
