@@ -203,6 +203,7 @@ class TestPlayer(unittest.TestCase):
                 self.__player1__.get_checkers_off_board())
         
         self.assertEqual(total, 15)
+    
 
 
 if __name__ == '__main__':
