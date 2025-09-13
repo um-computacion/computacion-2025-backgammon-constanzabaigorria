@@ -170,4 +170,24 @@ class Board:
         return []
 
     def is_race_position(self):
+       
+        players = set()
+        for point in self.__points:
+            for checker in point:
+                players.add(checker.get_owner())
+        if len(players) != 2:
+            return True  
+       
+        white_outside_home = any(
+            checker.get_owner().get_color() == "white" and not (19 <= i <= 23)
+            for i, point in enumerate(self.__points)
+            for checker in point
+        )
+        black_outside_home = any(
+            checker.get_owner().get_color() == "black" and not (0 <= i <= 5)
+            for i, point in enumerate(self.__points)
+            for checker in point
+        )
+        if white_outside_home and black_outside_home:
+            return False
         return True
