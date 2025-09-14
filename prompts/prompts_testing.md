@@ -352,140 +352,6 @@ Uso del código con modificaciones en las importaciones para que funcione.
 
 ## Prompt [4] 
 
-**Fecha**: 08-09-2025  
-**Modelo/Herramienta**: GitHub Copilot (GPT-4.1)  
-**Contexto**: creación de la clase Player para pasar los tests definidos en test_player.py
-
-## Prompt enviado
-
-crea la clase para este test
-
-### Respuesta recibida
-
-```
-class Player:
-    def __init__(self, name, color):
-        if not name:
-            raise ValueError("El nombre no puede estar vacío")
-        if color not in ("white", "black"):
-            raise ValueError("Color inválido")
-        self.__name = name
-        self.__color = color
-        self.__checkers_count = 15
-        self.__checkers_on_bar = 0
-        self.__checkers_off_board = 0
-        self.__winner = False
-        self.__can_move = True
-        self.__can_bear_off = False
-
-    def get_name(self):
-        return self.__name
-
-    def set_name(self, name):
-        if not name:
-            raise ValueError("El nombre no puede estar vacío")
-        self.__name = name
-
-    def get_color(self):
-        return self.__color
-
-    def set_color(self, color):
-        if color not in ("white", "black"):
-            raise ValueError("Color inválido")
-        self.__color = color
-
-    def get_checkers_count(self):
-        return self.__checkers_count
-
-    def set_checkers_count(self, count):
-        if not (0 <= count <= 15):
-            raise ValueError("Cantidad de fichas inválida")
-        self.__checkers_count = count
-
-    def get_checkers_on_bar(self):
-        return self.__checkers_on_bar
-
-    def set_checkers_on_bar(self, count):
-        if count < 0:
-            raise ValueError("Cantidad de fichas en la barra inválida")
-        self.__checkers_on_bar = count
-
-    def get_checkers_off_board(self):
-        return self.__checkers_off_board
-
-    def set_checkers_off_board(self, count):
-        if count < 0:
-            raise ValueError("Cantidad de fichas fuera del tablero inválida")
-        self.__checkers_off_board = count
-
-    def is_winner(self):
-        return self.__winner
-
-    def set_winner(self, winner):
-        self.__winner = bool(winner)
-
-    def can_move(self):
-        return self.__can_move
-
-    def set_can_move(self, can_move):
-        self.__can_move = bool(can_move)
-
-    def add_checker_to_bar(self):
-        self.__checkers_on_bar += 1
-
-    def remove_checker_from_bar(self):
-        if self.__checkers_on_bar == 0:
-            raise ValueError("No hay fichas en la barra para remover")
-        self.__checkers_on_bar -= 1
-
-    def add_checker_off_board(self):
-        self.__checkers_off_board += 1
-
-    def has_checkers_on_bar(self):
-        return self.__checkers_on_bar > 0
-
-    def can_bear_off(self):
-        return self.__can_bear_off
-
-    def set_can_bear_off(self, can_bear_off):
-        self.__can_bear_off = bool(can_bear_off)
-
-    def get_home_board_start(self):
-        return 19 if self.__color == "white" else 1
-
-    def get_direction(self):
-        return -1 if self.__color == "white" else 1
-
-    def __str__(self):
-        return f"Player(name={self.__name}, color={self.__color}, checkers={self.__checkers_count})"
-
-    def __eq__(self, other):
-        if not isinstance(other, Player):
-            return False
-        return (self.__name == other.__name and
-                self.__color == other.__color and
-                self.__checkers_count == other.__checkers_count and
-                self.__checkers_on_bar == other.__checkers_on_bar and
-                self.__checkers_off_board == other.__checkers_off_board)
-
-    def __hash__(self):
-        return hash((self.__name, self.__color, self.__checkers_count,
-                     self.__checkers_on_bar, self.__checkers_off_board))
-
-    def reset(self):
-        self.__checkers_count = 15
-        self.__checkers_on_bar = 0
-        self.__checkers_off_board = 0
-        self.__winner = False
-        self.__can_move = True
-        self.__can_bear_off = False
-```
-
-### Uso de la respuesta
-Uso de código con modificaciones para que pasen todos los tests
-
-## Prompt [5] 
-
 **Fecha**: 08-09-2025 
 **Modelo/Herramienta**: Claude Sonnet 4
 **Contexto**: creación de código para test de Board en rojo
@@ -874,196 +740,386 @@ if __name__ == '__main__':
 ### Uso de la respuesta
 se usa el código dado con correcciones en las importaciones.
 
-## Prompt [6] 
+## Prompt [5]
 
-**Fecha**: 08-09-2025  
-**Modelo/Herramienta**: GitHub Copilot (GPT-4.1)  
-**Contexto**: creación de la clase Board para pasar los tests definidos en test_board.py
+**Fecha**: 11-09-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: Creación de tests unitarios para la clase Checker siguiendo metodología TDD
 
-## Prompt enviado
+### Prompt enviado
 
-crea la clase para los siguientes tests unitarios
+crea varios tests unitarios para la clase checker, siguiendo la metodología TDD (o sea que esten en rojo porque falta la clase)
 
 ### Respuesta recibida
 
 ```
-from core.checker import Checker
+import unittest
+import sys
+import os
 
-class Board:
-    def __init__(self):
-        self.__points = [[] for _ in range(24)]
-        self.__bar = {}
-        self.__off_board = {}
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-    def get_points(self):
-        return self.__points
+try:
+    from core.checker import Checker
+    from core.player import Player
+except ImportError:
+    Checker = None
+    Player = None
 
-    def setup_initial_position(self, player1, player2):
-        self.reset()
-        # Standard backgammon setup
-        self.__points[0] = [Checker(player1) for _ in range(2)]
-        self.__points[11] = [Checker(player1) for _ in range(5)]
-        self.__points[16] = [Checker(player1) for _ in range(3)]
-        self.__points[18] = [Checker(player1) for _ in range(5)]
-        self.__points[23] = [Checker(player2) for _ in range(2)]
-        self.__points[12] = [Checker(player2) for _ in range(5)]
-        self.__points[7] = [Checker(player2) for _ in range(3)]
-        self.__points[5] = [Checker(player2) for _ in range(5)]
 
-    def is_point_empty(self, point):
-        return len(self.__points[point]) == 0
+class TestChecker(unittest.TestCase):
 
-    def get_point_owner(self, point):
-        if not self.__points[point]:
-            return None
-        return self.__points[point][0].get_owner()
+    def setUp(self):
+        if Checker is None or Player is None:
+            self.skipTest("Clase Checker o Player no implementada aún")
+        
+        self.__player1__ = Player("Jugador1", "white")
+        self.__player2__ = Player("Jugador2", "black")
+        self.__checker1__ = Checker(self.__player1__)
+        self.__checker2__ = Checker(self.__player2__)
 
-    def get_checkers_count_on_point(self, point):
-        if point < 0 or point > 23:
-            raise ValueError("Punto inválido")
-        return len(self.__points[point])
+    def test_checker_creation_with_player(self):
+        checker = Checker(self.__player1__)
+        self.assertEqual(checker.get_owner(), self.__player1__)
 
-    def add_checker_to_point(self, point, checker):
-        self.__points[point].append(checker)
+    def test_checker_owner_getter(self):
+        self.assertEqual(self.__checker1__.get_owner(), self.__player1__)
 
-    def remove_checker_from_point(self, point):
-        if not self.__points[point]:
-            raise ValueError("No hay fichas para remover")
-        return self.__points[point].pop()
+    def test_checker_owner_setter(self):
+        self.__checker1__.set_owner(self.__player2__)
+        self.assertEqual(self.__checker1__.get_owner(), self.__player2__)
 
-    def can_place_checker(self, point, player):
-        if self.is_point_empty(point):
-            return True
-        owner = self.get_point_owner(point)
-        if owner == player:
-            return True
-        return len(self.__points[point]) == 1
+    def test_checker_color_from_owner(self):
+        self.assertEqual(self.__checker1__.get_color(), "white")
+        self.assertEqual(self.__checker2__.get_color(), "black")
 
-    def is_point_blocked(self, point, player):
-        owner = self.get_point_owner(point)
-        return owner is not None and owner != player and len(self.__points[point]) > 1
+    def test_checker_position_initial(self):
+        self.assertIsNone(self.__checker1__.get_position())
 
-    def has_blot(self, point):
-        return len(self.__points[point]) == 1
+    def test_checker_position_getter(self):
+        position = self.__checker1__.get_position()
+        self.assertIsInstance(position, (int, type(None)))
 
-    def can_hit_blot(self, point, player):
-        owner = self.get_point_owner(point)
-        return self.has_blot(point) and owner is not None and owner != player
+    def test_checker_position_setter(self):
+        self.__checker1__.set_position(5)
+        self.assertEqual(self.__checker1__.get_position(), 5)
 
-    def hit_blot(self, point, player):
-        if not self.can_hit_blot(point, player):
-            raise ValueError("No se puede golpear blot")
-        return self.remove_checker_from_point(point)
+    def test_checker_position_setter_none(self):
+        self.__checker1__.set_position(None)
+        self.assertIsNone(self.__checker1__.get_position())
 
-    def get_bar_checkers_count(self, player):
-        return len(self.__bar.get(player, []))
+    def test_checker_is_on_board_true(self):
+        self.__checker1__.set_position(5)
+        self.assertTrue(self.__checker1__.is_on_board())
 
-    def add_checker_to_bar(self, checker):
-        owner = checker.get_owner()
-        if owner not in self.__bar:
-            self.__bar[owner] = []
-        self.__bar[owner].append(checker)
+    def test_checker_is_on_board_false(self):
+        self.assertFalse(self.__checker1__.is_on_board())
 
-    def remove_checker_from_bar(self, player):
-        if self.get_bar_checkers_count(player) == 0:
-            raise ValueError("No hay fichas en la barra")
-        return self.__bar[player].pop()
+    def test_checker_is_on_bar_initial(self):
+        self.assertFalse(self.__checker1__.is_on_bar())
 
-    def has_checkers_on_bar(self, player):
-        return self.get_bar_checkers_count(player) > 0
+    def test_checker_is_on_bar_getter(self):
+        is_on_bar = self.__checker1__.is_on_bar()
+        self.assertIsInstance(is_on_bar, bool)
 
-    def get_off_board_checkers_count(self, player):
-        return len(self.__off_board.get(player, []))
+    def test_checker_is_on_bar_setter_true(self):
+        self.__checker1__.set_on_bar(True)
+        self.assertTrue(self.__checker1__.is_on_bar())
 
-    def add_checker_off_board(self, checker):
-        owner = checker.get_owner()
-        if owner not in self.__off_board:
-            self.__off_board[owner] = []
-        self.__off_board[owner].append(checker)
+    def test_checker_is_on_bar_setter_false(self):
+        self.__checker1__.set_on_bar(True)
+        self.__checker1__.set_on_bar(False)
+        self.assertFalse(self.__checker1__.is_on_bar())
 
-    def is_valid_point(self, point):
-        return 0 <= point < 24
+    def test_checker_is_off_board_initial(self):
+        self.assertFalse(self.__checker1__.is_off_board())
 
-    def get_opposite_point(self, point):
-        return 23 - point
+    def test_checker_is_off_board_getter(self):
+        is_off_board = self.__checker1__.is_off_board()
+        self.assertIsInstance(is_off_board, bool)
 
-    def is_in_home_board(self, point, player):
-        if player.get_color() == "white":
-            return 19 <= point <= 23
-        else:
-            return 0 <= point <= 5
+    def test_checker_is_off_board_setter_true(self):
+        self.__checker1__.set_off_board(True)
+        self.assertTrue(self.__checker1__.is_off_board())
 
-    def can_bear_off(self, player):
-        if self.has_checkers_on_bar(player):
-            return False
-        home_points = range(19, 24) if player.get_color() == "white" else range(0, 6)
-        for i in range(24):
-            if i not in home_points:
-                for checker in self.__points[i]:
-                    if checker.get_owner() == player:
-                        return False
-        return True
+    def test_checker_is_off_board_setter_false(self):
+        self.__checker1__.set_off_board(True)
+        self.__checker1__.set_off_board(False)
+        self.assertFalse(self.__checker1__.is_off_board())
 
-    def get_furthest_checker(self, player):
-        if player.get_color() == "white":
-            for i in range(24):
-                if any(c.get_owner() == player for c in self.__points[i]):
-                    return i
-        else:
-            for i in reversed(range(24)):
-                if any(c.get_owner() == player for c in self.__points[i]):
-                    return i
-        return None
+    def test_checker_move_to_position(self):
+        self.__checker1__.move_to_position(10)
+        self.assertEqual(self.__checker1__.get_position(), 10)
+        self.assertTrue(self.__checker1__.is_on_board())
+        self.assertFalse(self.__checker1__.is_on_bar())
+        self.assertFalse(self.__checker1__.is_off_board())
 
-    def count_checkers_on_board(self, player):
-        return sum(1 for i in range(24) for c in self.__points[i] if c.get_owner() == player)
+    def test_checker_move_to_bar(self):
+        self.__checker1__.set_position(5)
+        self.__checker1__.move_to_bar()
+        self.assertIsNone(self.__checker1__.get_position())
+        self.assertFalse(self.__checker1__.is_on_board())
+        self.assertTrue(self.__checker1__.is_on_bar())
+        self.assertFalse(self.__checker1__.is_off_board())
 
-    def get_all_checker_positions(self, player):
-        return [i for i in range(24) if any(c.get_owner() == player for c in self.__points[i])]
+    def test_checker_move_off_board(self):
+        self.__checker1__.set_position(23)
+        self.__checker1__.move_off_board()
+        self.assertIsNone(self.__checker1__.get_position())
+        self.assertFalse(self.__checker1__.is_on_board())
+        self.assertFalse(self.__checker1__.is_on_bar())
+        self.assertTrue(self.__checker1__.is_off_board())
 
-    def clear_point(self, point):
-        cleared = self.__points[point][:]
-        self.__points[point] = []
-        return cleared
+    def test_checker_can_move_to_position_true(self):
+        self.__checker1__.set_position(5)
+        self.assertTrue(self.__checker1__.can_move_to_position(10))
 
-    def reset(self):
-        self.__points = [[] for _ in range(24)]
-        self.__bar = {}
-        self.__off_board = {}
+    def test_checker_can_move_to_position_false_same_position(self):
+        self.__checker1__.set_position(5)
+        self.assertFalse(self.__checker1__.can_move_to_position(5))
 
-    def copy(self):
-        import copy
-        return copy.deepcopy(self)
+    def test_checker_can_move_to_position_false_invalid_position(self):
+        self.__checker1__.set_position(5)
+        self.assertFalse(self.__checker1__.can_move_to_position(-1))
+        self.assertFalse(self.__checker1__.can_move_to_position(24))
 
-    def __str__(self):
-        return f"Board({self.__points})"
+    def test_checker_can_move_to_position_from_bar(self):
+        self.__checker1__.move_to_bar()
+        self.assertTrue(self.__checker1__.can_move_to_position(5))
 
-    def __eq__(self, other):
-        if not isinstance(other, Board):
-            return False
-        return self.__points == other.__points and self.__bar == other.__bar and self.__off_board == other.__off_board
+    def test_checker_can_move_to_position_off_board(self):
+        self.__checker1__.move_off_board()
+        self.assertFalse(self.__checker1__.can_move_to_position(5))
 
-    def __hash__(self):
-        return hash((tuple(tuple(point) for point in self.__points),
-                     tuple(sorted((k, tuple(v)) for k, v in self.__bar.items())),
-                     tuple(sorted((k, tuple(v)) for k, v in self.__off_board.items()))))
+    def test_checker_get_distance_to_position(self):
+        self.__checker1__.set_position(5)
+        distance = self.__checker1__.get_distance_to_position(10)
+        self.assertEqual(distance, 5)
 
-    def calculate_pip_count(self, player):
-        pip = 0
-        for i in range(24):
-            for checker in self.__points[i]:
-                if checker.get_owner() == player:
-                    pip += (24 - i) if player.get_color() == "white" else (i + 1)
-        return pip
+    def test_checker_get_distance_to_position_negative(self):
+        self.__checker1__.set_position(10)
+        distance = self.__checker1__.get_distance_to_position(5)
+        self.assertEqual(distance, -5)
 
-    def get_moves_to_bear_off(self, player):
-        # Dummy implementation for test compatibility
-        return []
+    def test_checker_get_distance_to_position_from_none(self):
+        distance = self.__checker1__.get_distance_to_position(5)
+        self.assertIsNone(distance)
 
-    def is_race_position(self):
-        # Dummy implementation for test compatibility
-        return True
+    def test_checker_is_blot_true(self):
+        self.__checker1__.set_position(5)
+        self.assertTrue(self.__checker1__.is_blot())
+
+    def test_checker_is_blot_false_not_on_board(self):
+        self.assertFalse(self.__checker1__.is_blot())
+
+    def test_checker_can_be_hit_true(self):
+        self.__checker1__.set_position(5)
+        self.assertTrue(self.__checker1__.can_be_hit(self.__player2__))
+
+    def test_checker_can_be_hit_false_same_player(self):
+        self.__checker1__.set_position(5)
+        self.assertFalse(self.__checker1__.can_be_hit(self.__player1__))
+
+    def test_checker_can_be_hit_false_not_on_board(self):
+        self.assertFalse(self.__checker1__.can_be_hit(self.__player2__))
+
+    def test_checker_hit_by_opponent(self):
+        self.__checker1__.set_position(5)
+        self.__checker1__.hit_by_opponent()
+        self.assertTrue(self.__checker1__.is_on_bar())
+        self.assertFalse(self.__checker1__.is_on_board())
+
+    def test_checker_hit_by_opponent_not_on_board(self):
+        with self.assertRaises(ValueError):
+            self.__checker1__.hit_by_opponent()
+
+    def test_checker_reset_position(self):
+        self.__checker1__.set_position(5)
+        self.__checker1__.set_on_bar(True)
+        self.__checker1__.set_off_board(True)
+        
+        self.__checker1__.reset_position()
+        
+        self.assertIsNone(self.__checker1__.get_position())
+        self.assertFalse(self.__checker1__.is_on_bar())
+        self.assertFalse(self.__checker1__.is_off_board())
+
+    def test_checker_is_in_home_board_white_true(self):
+        self.__checker1__.set_position(20)
+        self.assertTrue(self.__checker1__.is_in_home_board())
+
+    def test_checker_is_in_home_board_white_false(self):
+        self.__checker1__.set_position(18)
+        self.assertFalse(self.__checker1__.is_in_home_board())
+
+    def test_checker_is_in_home_board_black_true(self):
+        self.__checker2__.set_position(3)
+        self.assertTrue(self.__checker2__.is_in_home_board())
+
+    def test_checker_is_in_home_board_black_false(self):
+        self.__checker2__.set_position(6)
+        self.assertFalse(self.__checker2__.is_in_home_board())
+
+    def test_checker_is_in_home_board_not_on_board(self):
+        self.assertFalse(self.__checker1__.is_in_home_board())
+
+    def test_checker_can_bear_off_true(self):
+        self.__checker1__.set_position(23)
+        self.assertTrue(self.__checker1__.can_bear_off())
+
+    def test_checker_can_bear_off_false_not_in_home(self):
+        self.__checker1__.set_position(18)
+        self.assertFalse(self.__checker1__.can_bear_off())
+
+    def test_checker_can_bear_off_false_not_on_board(self):
+        self.assertFalse(self.__checker1__.can_bear_off())
+
+    def test_checker_get_pip_value_white(self):
+        self.__checker1__.set_position(5)
+        pip_value = self.__checker1__.get_pip_value()
+        self.assertEqual(pip_value, 19)
+
+    def test_checker_get_pip_value_black(self):
+        self.__checker2__.set_position(5)
+        pip_value = self.__checker2__.get_pip_value()
+        self.assertEqual(pip_value, 6)
+
+    def test_checker_get_pip_value_not_on_board(self):
+        pip_value = self.__checker1__.get_pip_value()
+        self.assertEqual(pip_value, 0)
+
+    def test_checker_get_direction_white(self):
+        direction = self.__checker1__.get_direction()
+        self.assertEqual(direction, -1)
+
+    def test_checker_get_direction_black(self):
+        direction = self.__checker2__.get_direction()
+        self.assertEqual(direction, 1)
+
+    def test_checker_is_moving_forward_white_true(self):
+        self.__checker1__.set_position(10)
+        self.assertTrue(self.__checker1__.is_moving_forward(5))
+
+    def test_checker_is_moving_forward_white_false(self):
+        self.__checker1__.set_position(5)
+        self.assertFalse(self.__checker1__.is_moving_forward(10))
+
+    def test_checker_is_moving_forward_black_true(self):
+        self.__checker2__.set_position(5)
+        self.assertTrue(self.__checker2__.is_moving_forward(10))
+
+    def test_checker_is_moving_forward_black_false(self):
+        self.__checker2__.set_position(10)
+        self.assertFalse(self.__checker2__.is_moving_forward(5))
+
+    def test_checker_is_moving_forward_not_on_board(self):
+        with self.assertRaises(ValueError):
+            self.__checker1__.is_moving_forward(5)
+
+    def test_checker_clone(self):
+        self.__checker1__.set_position(5)
+        self.__checker1__.set_on_bar(True)
+        
+        cloned_checker = self.__checker1__.clone()
+        
+        self.assertIsNot(cloned_checker, self.__checker1__)
+        self.assertEqual(cloned_checker.get_owner(), self.__checker1__.get_owner())
+        self.assertEqual(cloned_checker.get_position(), self.__checker1__.get_position())
+        self.assertEqual(cloned_checker.is_on_bar(), self.__checker1__.is_on_bar())
+
+    def test_checker_string_representation(self):
+        self.__checker1__.set_position(5)
+        expected = "Checker(owner=Jugador1, color=white, position=5)"
+        self.assertEqual(str(self.__checker1__), expected)
+
+    def test_checker_string_representation_on_bar(self):
+        self.__checker1__.move_to_bar()
+        expected = "Checker(owner=Jugador1, color=white, position=BAR)"
+        self.assertEqual(str(self.__checker1__), expected)
+
+    def test_checker_string_representation_off_board(self):
+        self.__checker1__.move_off_board()
+        expected = "Checker(owner=Jugador1, color=white, position=OFF)"
+        self.assertEqual(str(self.__checker1__), expected)
+
+    def test_checker_equality_same_checker(self):
+        self.assertEqual(self.__checker1__, self.__checker1__)
+
+    def test_checker_equality_different_checkers_same_attributes(self):
+        checker3 = Checker(self.__player1__)
+        checker3.set_position(5)
+        self.__checker1__.set_position(5)
+        self.assertEqual(self.__checker1__, checker3)
+
+    def test_checker_equality_different_checkers_different_attributes(self):
+        self.__checker1__.set_position(5)
+        self.__checker2__.set_position(10)
+        self.assertNotEqual(self.__checker1__, self.__checker2__)
+
+    def test_checker_hash_consistency(self):
+        self.__checker1__.set_position(5)
+        hash1 = hash(self.__checker1__)
+        hash2 = hash(self.__checker1__)
+        self.assertEqual(hash1, hash2)
+
+    def test_checker_invalid_owner(self):
+        with self.assertRaises(ValueError):
+            Checker(None)
+
+    def test_checker_invalid_position_negative(self):
+        with self.assertRaises(ValueError):
+            self.__checker1__.set_position(-1)
+
+    def test_checker_invalid_position_too_high(self):
+        with self.assertRaises(ValueError):
+            self.__checker1__.set_position(24)
+
+    def test_checker_invalid_owner_setter(self):
+        with self.assertRaises(ValueError):
+            self.__checker1__.set_owner(None)
+
+    def test_checker_state_consistency_on_board(self):
+        self.__checker1__.set_position(5)
+        self.assertTrue(self.__checker1__.is_on_board())
+        self.assertFalse(self.__checker1__.is_on_bar())
+        self.assertFalse(self.__checker1__.is_off_board())
+
+    def test_checker_state_consistency_on_bar(self):
+        self.__checker1__.move_to_bar()
+        self.assertFalse(self.__checker1__.is_on_board())
+        self.assertTrue(self.__checker1__.is_on_bar())
+        self.assertFalse(self.__checker1__.is_off_board())
+
+    def test_checker_state_consistency_off_board(self):
+        self.__checker1__.move_off_board()
+        self.assertFalse(self.__checker1__.is_on_board())
+        self.assertFalse(self.__checker1__.is_on_bar())
+        self.assertTrue(self.__checker1__.is_off_board())
+
+    def test_checker_multiple_state_changes(self):
+        self.__checker1__.set_position(5)
+        self.__checker1__.move_to_bar()
+        self.__checker1__.move_to_position(10)
+        self.__checker1__.move_off_board()
+        
+        self.assertIsNone(self.__checker1__.get_position())
+        self.assertFalse(self.__checker1__.is_on_board())
+        self.assertFalse(self.__checker1__.is_on_bar())
+        self.assertTrue(self.__checker1__.is_off_board())
+
+    def test_checker_distance_calculation_edge_cases(self):
+        self.__checker1__.set_position(0)
+        distance_to_end = self.__checker1__.get_distance_to_position(23)
+        self.assertEqual(distance_to_end, 23)
+        
+        distance_to_start = self.__checker1__.get_distance_to_position(0)
+        self.assertEqual(distance_to_start, 0)
+
+
+if __name__ == '__main__':
+    unittest.main()
 ```
 
 ## Uso de la respuesta
-Se usa el código dado pero se eliminan los comentarios.
+
+Uso del código solo cambiando las importaciones.
