@@ -325,3 +325,303 @@ class Board:
 
 ## Uso de la respuesta
 Se usa el código dado pero se eliminan los comentarios.
+
+## Prompt [3] 
+
+**Fecha**: 12-09-2025  
+**Modelo/Herramienta**: GitHub Copilot (GPT-4.1)  
+**Contexto**: creación de la clase Checker para pasar los tests definidos en test_checker.py
+
+## Prompt enviado
+
+#file:test_checker.py realiza la clase para que puedn pasar los tests de checker
+
+### Respuesta recibida
+
+```
+from typing import Optional
+from core.player import Player
+
+class Checker:
+    """
+    Clase que representa una ficha de backgammon, asociada a un jugador y con estado de posición.
+    """
+
+    def __init__(self, owner: Player) -> None:
+        """
+        Inicializa una ficha con su propietario.
+        :param owner: Jugador propietario de la ficha.
+        :raises ValueError: Si el propietario es None.
+        """
+        if owner is None:
+            raise ValueError("El propietario no puede ser None")
+        self.__owner: Player = owner
+        self.__position: Optional[int] = None
+        self.__on_bar: bool = False
+        self.__off_board: bool = False
+
+    def get_owner(self) -> Player:
+        """
+        Devuelve el propietario de la ficha.
+        :return: Jugador propietario.
+        """
+        return self.__owner
+
+    def set_owner(self, owner: Player) -> None:
+        """
+        Asigna un nuevo propietario a la ficha.
+        :param owner: Nuevo propietario.
+        :raises ValueError: Si el propietario es None.
+        """
+        if owner is None:
+            raise ValueError("El propietario no puede ser None")
+        self.__owner = owner
+
+    def get_color(self) -> str:
+        """
+        Devuelve el color de la ficha según el propietario.
+        :return: "white" o "black".
+        """
+        return self.__owner.get_color()
+
+    def get_position(self) -> Optional[int]:
+        """
+        Devuelve la posición actual de la ficha (0-23), None si no está en el tablero.
+        :return: Posición o None.
+        """
+        return self.__position
+
+    def set_position(self, position: Optional[int]) -> None:
+        """
+        Asigna la posición de la ficha.
+        :param position: Nueva posición (0-23) o None.
+        :raises ValueError: Si la posición es inválida.
+        """
+        if position is not None and (position < 0 or position > 23):
+            raise ValueError("Posición inválida")
+        self.__position = position
+        if position is not None:
+            self.__on_bar = False
+            self.__off_board = False
+
+    def is_on_board(self) -> bool:
+        """
+        Indica si la ficha está en el tablero.
+        :return: True si está en el tablero.
+        """
+        return self.__position is not None and not self.__on_bar and not self.__off_board
+
+    def is_on_bar(self) -> bool:
+        """
+        Indica si la ficha está en la barra.
+        :return: True si está en la barra.
+        """
+        return self.__on_bar
+
+    def set_on_bar(self, value: bool) -> None:
+        """
+        Establece si la ficha está en la barra.
+        :param value: True para poner en barra, False para quitar.
+        """
+        self.__on_bar = value
+        if value:
+            self.__position = None
+            self.__off_board = False
+
+    def is_off_board(self) -> bool:
+        """
+        Indica si la ficha está fuera del tablero.
+        :return: True si está fuera.
+        """
+        return self.__off_board
+
+    def set_off_board(self, value: bool) -> None:
+        """
+        Establece si la ficha está fuera del tablero.
+        :param value: True para sacar del tablero, False para poner en juego.
+        """
+        self.__off_board = value
+        if value:
+            self.__position = None
+            self.__on_bar = False
+
+    def move_to_position(self, position: int) -> None:
+        """
+        Mueve la ficha a una posición del tablero.
+        :param position: Nueva posición (0-23).
+        """
+        self.set_position(position)
+        self.__on_bar = False
+        self.__off_board = False
+
+    def move_to_bar(self) -> None:
+        """
+        Mueve la ficha a la barra.
+        """
+        self.__position = None
+        self.__on_bar = True
+        self.__off_board = False
+
+    def move_off_board(self) -> None:
+        """
+        Saca la ficha del tablero.
+        """
+        self.__position = None
+        self.__on_bar = False
+        self.__off_board = True
+
+    def can_move_to_position(self, position: int) -> bool:
+        """
+        Indica si la ficha puede moverse a una posición.
+        :param position: Posición destino.
+        :return: True si puede moverse.
+        """
+        if self.is_off_board():
+            return False
+        if position < 0 or position > 23:
+            return False
+        if self.__position == position:
+            return False
+        return True
+
+    def get_distance_to_position(self, position: int) -> Optional[int]:
+        """
+        Calcula la distancia a una posición.
+        :param position: Posición destino.
+        :return: Distancia o None si no está en el tablero.
+        """
+        if self.__position is None:
+            return None
+        return position - self.__position
+
+    def is_blot(self) -> bool:
+        """
+        Indica si la ficha es un blot (está sola en su punto).
+        :return: True si es blot.
+        """
+        return self.is_on_board()
+
+    def can_be_hit(self, opponent: Player) -> bool:
+        """
+        Indica si la ficha puede ser golpeada por un oponente.
+        :param opponent: Jugador oponente.
+        :return: True si puede ser golpeada.
+        """
+        return self.is_on_board() and self.__owner != opponent
+
+    def hit_by_opponent(self) -> None:
+        """
+        Mueve la ficha a la barra si es golpeada.
+        :raises ValueError: Si la ficha no está en el tablero.
+        """
+        if not self.is_on_board():
+            raise ValueError("La ficha no está en el tablero")
+        self.move_to_bar()
+
+    def reset_position(self) -> None:
+        """
+        Resetea la posición y estado de la ficha.
+        """
+        self.__position = None
+        self.__on_bar = False
+        self.__off_board = False
+
+    def is_in_home_board(self) -> bool:
+        """
+        Indica si la ficha está en el home board según su color.
+        :return: True si está en home board.
+        """
+        if not self.is_on_board():
+            return False
+        if self.get_color() == "white":
+            return 19 <= self.__position <= 23
+        else:
+            return 0 <= self.__position <= 5
+
+    def can_bear_off(self) -> bool:
+        """
+        Indica si la ficha puede salir del tablero.
+        :return: True si puede salir.
+        """
+        return self.is_on_board() and self.is_in_home_board()
+
+    def get_pip_value(self) -> int:
+        """
+        Devuelve el valor pip de la ficha.
+        :return: Valor pip.
+        """
+        if not self.is_on_board():
+            return 0
+        if self.get_color() == "white":
+            return 24 - self.__position
+        else:
+            return self.__position + 1
+
+    def get_direction(self) -> int:
+        """
+        Devuelve la dirección de movimiento según el color.
+        :return: -1 para blancas, 1 para negras.
+        """
+        return -1 if self.get_color() == "white" else 1
+
+    def is_moving_forward(self, target_position: int) -> bool:
+        """
+        Indica si el movimiento es hacia adelante según el color.
+        :param target_position: Posición destino.
+        :return: True si es hacia adelante.
+        :raises ValueError: Si la ficha no está en el tablero.
+        """
+        if not self.is_on_board():
+            raise ValueError("La ficha no está en el tablero")
+        direction = self.get_direction()
+        return (target_position - self.__position) * direction > 0
+
+    def clone(self) -> "Checker":
+        """
+        Devuelve una copia de la ficha.
+        :return: Nueva instancia de Checker.
+        """
+        new_checker = Checker(self.__owner)
+        new_checker.set_position(self.__position)
+        new_checker.set_on_bar(self.__on_bar)
+        new_checker.set_off_board(self.__off_board)
+        return new_checker
+
+    def __str__(self) -> str:
+        """
+        Representación en string de la ficha.
+        :return: String descriptivo.
+        """
+        pos = self.__position
+        if self.__on_bar:
+            pos_str = "BAR"
+        elif self.__off_board:
+            pos_str = "OFF"
+        else:
+            pos_str = str(pos) if pos is not None else "None"
+        return f"Checker(owner={self.__owner.get_name()}, color={self.get_color()}, position={pos_str})"
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compara dos fichas por propietario, posición y estado.
+        :param other: Otra ficha.
+        :return: True si son iguales.
+        """
+        if not isinstance(other, Checker):
+            return False
+        return (self.__owner == other.__owner and
+                self.__position == other.__position and
+                self.__on_bar == other.__on_bar and
+                self.__off_board == other.__off_board)
+
+    def __hash__(self) -> int:
+        """
+        Hash de la ficha.
+        :return: Valor hash.
+        """
+        return hash((self.__owner, self.__position, self.__on_bar, self.__off_board))
+```
+
+## Uso de la respuesta
+
+Uso del código dado eliminando los comentarios
