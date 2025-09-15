@@ -357,6 +357,5 @@ class TestBoard(unittest.TestCase):
         self.__board__.setup_initial_position(self.__player1__, self.__player2__)
         self.assertFalse(self.__board__.is_race_position())
 
-
 if __name__ == '__main__':
     unittest.main()
