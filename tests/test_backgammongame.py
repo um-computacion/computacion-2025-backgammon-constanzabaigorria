@@ -5,6 +5,7 @@ from core.board import Board
 from core.dice import Dice
 
 
+
 class TestBackgammonGame(unittest.TestCase):
 
     def setUp(self):
