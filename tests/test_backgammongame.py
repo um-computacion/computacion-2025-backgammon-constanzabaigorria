@@ -1,19 +1,9 @@
 import unittest
-import sys
-import os
+from core.backgammongame import BackgammonGame
+from core.player import Player
+from core.board import Board
+from core.dice import Dice
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-try:
-    from core.backgammon_game import BackgammonGame
-    from core.player import Player
-    from core.board import Board
-    from core.dice import Dice
-except ImportError:
-    BackgammonGame = None
-    Player = None
-    Board = None
-    Dice = None
 
 
 class TestBackgammonGame(unittest.TestCase):
@@ -364,10 +354,10 @@ class TestBackgammonGame(unittest.TestCase):
 
     def test_game_make_move_after_finish(self):
         self.__game__.start_game()
-        self.__game__.finish_game()
-        self.__game__.roll_dice()
+        self.__game__.roll_dice()  
+        self.__game__.finish_game()  
         with self.assertRaises(ValueError):
-            self.__game__.make_move(0, 5)
+            self.__game__.make_move(0, 5)  
 
     def test_game_roll_dice_when_finished(self):
         self.__game__.finish_game()
