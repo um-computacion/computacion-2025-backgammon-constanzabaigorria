@@ -97,15 +97,10 @@ class Player:
     def __eq__(self, other):
         if not isinstance(other, Player):
             return False
-        return (self.__name == other.__name and
-                self.__color == other.__color and
-                self.__checkers_count == other.__checkers_count and
-                self.__checkers_on_bar == other.__checkers_on_bar and
-                self.__checkers_off_board == other.__checkers_off_board)
+        return self.__name == other.__name and self.__color == other.__color
 
     def __hash__(self):
-        return hash((self.__name, self.__color, self.__checkers_count,
-                     self.__checkers_on_bar, self.__checkers_off_board))
+        return hash((self.__name, self.__color))
 
     def reset(self):
         self.__checkers_count = 15

@@ -1,6 +1,7 @@
 __pycache__/
 venv/
 .coverage
+.DS_Store
 REPORTS.md
 cobertura.xml
 coverage.xml

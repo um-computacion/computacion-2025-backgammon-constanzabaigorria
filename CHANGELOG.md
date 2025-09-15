@@ -5,8 +5,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - Implementación de la clase `Player` en `core/player.py` con atributos privados, getters y setters.
-- Tests unitarios completos para la clase `Player` en `tests/test_player.py`.
+- Tests unitarios completos para la clase `Player`.
 - Documentación de prompts y respuestas en `prompts/prompts_testing.md`.
+- Tests uniarios completos para la clase `Board` (en rojo).
+- Implementación de la clase `Board` con errores por la falta de clase Checker.
+- Implementación de tests unitarios para clase checker y backgammongame (en rojo).
+- Implementación de clase checker.
+- Implementación de clase Backgammongame.
 
 
 ## [Sprint 1] – 2025-09-03
