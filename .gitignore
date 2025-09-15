@@ -1,10 +1,10 @@
 __pycache__/
 venv/
 .coverage
-.github/copilot-instructions.md
-cobertura.xml
-coverage_report.txt
-coverage.xml
-generate_coverage_report.py
-pylint_report.txt
+.DS_Store
 REPORTS.md
+cobertura.xml
+coverage.xml
+coverage_report.txt
+pylint_report.txt
+generate_reports.py
