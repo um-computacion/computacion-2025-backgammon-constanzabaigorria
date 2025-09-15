@@ -1,0 +1,7 @@
+Name             Stmts   Miss Branch BrPart  Cover   Missing
+------------------------------------------------------------
+core/player.py      85      3     18      3    94%   21, 29, 99
+------------------------------------------------------------
+TOTAL              105      3     20      3    95%
+
+1 file skipped due to complete coverage.
