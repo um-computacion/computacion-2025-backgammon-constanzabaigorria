@@ -907,3 +907,93 @@ class BackgammonGame:
 ## Uso de la respuesta
 
 Uso del código con cambios para que funcione.
+
+## Prompt [5] 
+
+**Fecha**: 17-09-2025  
+**Modelo/Herramienta**: GitHub Copilot (GPT-4.1)  
+**Contexto**: creación de la clase Dice para pasar los tests definidos en test_dice.py
+
+## Prompt enviado
+
+crea una clase para estos tests
+
+### Respuesta recibida
+
+```
+import random
+from typing import List, Tuple
+
+class Dice:
+    """
+    Clase que representa los dados del juego de Backgammon.
+    """
+
+    def __init__(self, sides: int = 6) -> None:
+        """
+        Inicializa los dados con el número de caras especificado.
+        :param sides: Número de caras de los dados (por defecto 6).
+        """
+        self.__sides: int = sides
+        self.__last_roll: Tuple[int, int] = (1, 1)
+
+    def roll(self) -> Tuple[int, int]:
+        """
+        Realiza una tirada de dados y guarda el resultado.
+        :return: Una tupla con los valores de los dos dados.
+        """
+        die1 = random.randint(1, self.__sides)
+        die2 = random.randint(1, self.__sides)
+        self.__last_roll = (die1, die2)
+        return self.__last_roll
+
+    def get_last_roll(self) -> Tuple[int, int]:
+        """
+        Devuelve la última tirada realizada.
+        :return: Tupla con los valores de los dados.
+        """
+        return self.__last_roll
+
+    def set_last_roll(self, roll: Tuple[int, int]) -> None:
+        """
+        Permite establecer manualmente la última tirada.
+        :param roll: Tupla con los valores de los dados.
+        """
+        self.__last_roll = roll
+
+    def get_sides(self) -> int:
+        """
+        Devuelve el número de caras de los dados.
+        :return: Número de caras.
+        """
+        return self.__sides
+
+    def set_sides(self, sides: int) -> None:
+        """
+        Permite cambiar el número de caras de los dados.
+        :param sides: Nuevo número de caras.
+        """
+        self.__sides = sides
+
+    def is_double(self, roll: Tuple[int, int]) -> bool:
+        """
+        Indica si la tirada es doble (ambos dados iguales).
+        :param roll: Tupla con los valores de los dados.
+        :return: True si es doble, False si no.
+        """
+        return roll[0] == roll[1]
+
+    def get_moves(self, roll: Tuple[int, int]) -> List[int]:
+        """
+        Devuelve la lista de movimientos posibles según la tirada.
+        :param roll: Tupla con los valores de los dados.
+        :return: Lista de movimientos (4 si es doble, 2 si no).
+        """
+        if self.is_double(roll):
+            return [roll[0]] * 4
+        return [roll[0], roll[1]]
+```
+
+## Uso de la respuesta
+
+se incorporó el código sin cambios, solo se borraron los comentarios.
