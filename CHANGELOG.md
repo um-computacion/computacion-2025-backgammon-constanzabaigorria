@@ -3,6 +3,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Se agregó la importación de la clase `Checker` en `core/backgammongame.py`.
+- Se crearon listas de fichas para cada jugador y método para inicializar la posición de las fichas usando objetos `Checker`.
+
 ## [Sprint 2] – 2025-09-17
 
 ### Added

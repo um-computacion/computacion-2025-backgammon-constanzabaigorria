@@ -997,3 +997,131 @@ class Dice:
 ## Uso de la respuesta
 
 se incorporó el código sin cambios, solo se borraron los comentarios.
+
+## Prompt [6]
+
+**Fecha**: 23-09-2025  
+**Modelo/Herramienta**: GitHub Copilot (GPT-4.1)  
+**Contexto**: corrección de importación y código de clase backgammongame
+
+## Prompt enviado
+
+agrega a mi codigo la importacion de checker
+
+### Respuesta recibida
+
+```
+"""
+Módulo principal del juego Backgammon.
+
+Esta clase orquesta el juego de Backgammon, gestionando jugadores, tablero, dados y lógica principal.
+"""
+
+from typing import Optional, List, Dict, Any
+from core.player import Player
+from core.board import Board
+from core.dice import Dice
+from core.checker import Checker  # Importación agregada
+
+class BackgammonGame:
+    """
+    Clase principal del juego Backgammon.
+
+    Gestiona el estado central del juego, incluyendo jugadores, tablero, dados, historial de movimientos y fichas.
+    """
+
+    def __init__(self, player1_name: str = "Player 1", player2_name: str = "Player 2") -> None:
+        """
+        Inicializa una nueva instancia de BackgammonGame.
+
+        Args:
+            player1_name (str): Nombre del jugador 1.
+            player2_name (str): Nombre del jugador 2.
+        """
+        if not player1_name or not player2_name:
+            raise ValueError("Los nombres de los jugadores no pueden estar vacíos")
+        if player1_name == player2_name:
+            raise ValueError("Los nombres de los jugadores deben ser distintos")
+        self.__player1: Player = Player(player1_name, "white")
+        self.__player2: Player = Player(player2_name, "black")
+        self.__board: Board = Board()
+        self.__dice: Dice = Dice()
+        self.__current_player: Player = self.__player1
+        self.__started: bool = False
+        self.__finished: bool = False
+        self.__winner: Optional[Player] = None
+        self.__last_dice_roll: Optional[tuple] = None
+        self.__dice_rolled: bool = False
+        self.__moves_count: int = 0
+        self.__turn_number: int = 1
+        self.__move_history: List[Any] = []
+        self.__match_score: Dict[Player, int] = {self.__player1: 0, self.__player2: 0}
+        self.__double_offered: bool = False
+        self.__doubling_cube_value: int = 1
+        self.__doubling_cube_owner: Optional[Player] = None
+        self.__game_type: str = "single"
+        # Fichas de cada jugador
+        self.__player1_checkers: List[Checker] = [Checker(self.__player1) for _ in range(15)]
+        self.__player2_checkers: List[Checker] = [Checker(self.__player2) for _ in range(15)]
+
+    def setup_initial_position(self) -> None:
+        """
+        Configura la posición inicial del tablero y las fichas usando objetos Checker.
+        """
+        self.__board.setup_initial_position(self.__player1, self.__player2)
+        for checker in self.__player1_checkers:
+            checker.reset_position()
+        for checker in self.__player2_checkers:
+            checker.reset_position()
+        # Ubicación inicial de las fichas (ejemplo clásico)
+        idx = 0
+        for _ in range(2):
+            self.__player1_checkers[idx].set_position(0)
+            idx += 1
+        for _ in range(5):
+            self.__player1_checkers[idx].set_position(11)
+            idx += 1
+        for _ in range(3):
+            self.__player1_checkers[idx].set_position(16)
+            idx += 1
+        for _ in range(5):
+            self.__player1_checkers[idx].set_position(18)
+            idx += 1
+        idx = 0
+        for _ in range(2):
+            self.__player2_checkers[idx].set_position(23)
+            idx += 1
+        for _ in range(5):
+            self.__player2_checkers[idx].set_position(12)
+            idx += 1
+        for _ in range(3):
+            self.__player2_checkers[idx].set_position(7)
+            idx += 1
+        for _ in range(5):
+            self.__player2_checkers[idx].set_position(5)
+            idx += 1
+
+    def get_player1_checkers(self) -> List[Checker]:
+        """
+        Devuelve la lista de fichas del jugador 1.
+
+        Returns:
+            List[Checker]: Lista de fichas.
+        """
+        return self.__player1_checkers
+
+    def get_player2_checkers(self) -> List[Checker]:
+        """
+        Devuelve la lista de fichas del jugador 2.
+
+        Returns:
+            List[Checker]: Lista de fichas.
+        """
+        return self.__player2_checkers
+
+    # ...existing code...
+    # El resto de los métodos permanecen igual, pero ahora puedes usar self.__player1_checkers y self.__player2_checkers
+```
+## Uso de la respuesta
+
+se utiliza el código dado sin comentarios.
