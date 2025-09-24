@@ -2,9 +2,12 @@ from typing import Optional, List, Dict, Any
 from core.player import Player
 from core.board import Board
 from core.dice import Dice
+from core.checker import Checker  
 
 class BackgammonGame:
+
     def __init__(self, player1_name: str = "Player 1", player2_name: str = "Player 2") -> None:
+       
         if not player1_name or not player2_name:
             raise ValueError("Los nombres de los jugadores no pueden estar vacíos")
         if player1_name == player2_name:
@@ -27,6 +30,47 @@ class BackgammonGame:
         self.__doubling_cube_value: int = 1
         self.__doubling_cube_owner: Optional[Player] = None
         self.__game_type: str = "single"
+        self.__player1_checkers: List[Checker] = [Checker(self.__player1) for _ in range(15)]
+        self.__player2_checkers: List[Checker] = [Checker(self.__player2) for _ in range(15)]
+
+    def setup_initial_position(self) -> None:
+        self.__board.setup_initial_position(self.__player1, self.__player2)
+        for checker in self.__player1_checkers:
+            checker.reset_position()
+        for checker in self.__player2_checkers:
+            checker.reset_position()
+        idx = 0
+        for _ in range(2):
+            self.__player1_checkers[idx].set_position(0)
+            idx += 1
+        for _ in range(5):
+            self.__player1_checkers[idx].set_position(11)
+            idx += 1
+        for _ in range(3):
+            self.__player1_checkers[idx].set_position(16)
+            idx += 1
+        for _ in range(5):
+            self.__player1_checkers[idx].set_position(18)
+            idx += 1
+        idx = 0
+        for _ in range(2):
+            self.__player2_checkers[idx].set_position(23)
+            idx += 1
+        for _ in range(5):
+            self.__player2_checkers[idx].set_position(12)
+            idx += 1
+        for _ in range(3):
+            self.__player2_checkers[idx].set_position(7)
+            idx += 1
+        for _ in range(5):
+            self.__player2_checkers[idx].set_position(5)
+            idx += 1
+
+    def get_player1_checkers(self) -> List[Checker]:
+        return self.__player1_checkers
+
+    def get_player2_checkers(self) -> List[Checker]:
+        return self.__player2_checkers
 
     def get_player1(self) -> Player:
         return self.__player1
