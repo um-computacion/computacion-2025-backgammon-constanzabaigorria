@@ -3,7 +3,6 @@ venv/
 .venv/
 .coverage
 .DS_Store
-REPORTS.md
 cobertura.xml
 coverage.xml
 coverage_report.txt
