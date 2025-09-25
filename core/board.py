@@ -209,7 +209,7 @@ class Board:
                     pip += (24 - i) if player.get_color() == "white" else (i + 1)
         return pip
 
-    def get_moves_to_bear_off(self, player: Player) -> List[Any]:
+    def get_moves_to_bear_off(self) -> List[Any]:
         """Devuelve los movimientos posibles para sacar fichas del tablero."""
         return []
 
