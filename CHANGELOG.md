@@ -6,6 +6,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Se agregó la importación de la clase `Checker` en `core/backgammongame.py`.
 - Se crearon listas de fichas para cada jugador y método para inicializar la posición de las fichas usando objetos `Checker`.
+- Se corrigió el archivo `core/backgammongame.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
+- Se corrigió el archivo `core/board.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
+- Se corrigió el archivo `core/checker.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
+- Se corrigió el archivo `core/dice.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
+- Se corrigió el archivo `core/player.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
 
 ## [Sprint 2] – 2025-09-17
 
