@@ -1,4 +1,7 @@
-"""Módulo principal del juego Backgammon."""
+"""Módulo principal del juego Backgammon.
+
+Esta clase orquesta el juego de Backgammon, gestionando jugadores, tablero, dados y lógica principal.
+"""
 
 from typing import Optional, List, Dict, Any
 from core.player import Player
@@ -6,13 +9,10 @@ from core.board import Board
 from core.dice import Dice
 from core.checker import Checker
 
-
 class BackgammonGame:
     """Clase principal del juego Backgammon."""
 
-    def __init__(
-        self, player1_name: str = "Player 1", player2_name: str = "Player 2"
-    ) -> None:
+    def __init__(self, player1_name: str = "Player 1", player2_name: str = "Player 2") -> None:
         """
         Inicializa una nueva instancia de BackgammonGame.
 
@@ -42,12 +42,8 @@ class BackgammonGame:
         self.__doubling_cube_value: int = 1
         self.__doubling_cube_owner: Optional[Player] = None
         self.__game_type: str = "single"
-        self.__player1_checkers: List[Checker] = [
-            Checker(self.__player1) for _ in range(15)
-        ]
-        self.__player2_checkers: List[Checker] = [
-            Checker(self.__player2) for _ in range(15)
-        ]
+        self.__player1_checkers: List[Checker] = [Checker(self.__player1) for _ in range(15)]
+        self.__player2_checkers: List[Checker] = [Checker(self.__player2) for _ in range(15)]
 
     def setup_initial_position(self) -> None:
         """Configura la posición inicial del tablero y las fichas usando objetos Checker."""
@@ -155,11 +151,7 @@ class BackgammonGame:
 
     def switch_player(self) -> None:
         """Cambia el jugador actual."""
-        self.__current_player = (
-            self.__player2
-            if self.__current_player == self.__player1
-            else self.__player1
-        )
+        self.__current_player = self.__player2 if self.__current_player == self.__player1 else self.__player1
 
     def roll_dice(self) -> tuple:
         """Lanza los dados y devuelve el resultado."""
@@ -182,11 +174,11 @@ class BackgammonGame:
         """Devuelve los movimientos disponibles."""
         return []
 
-    def is_valid_move(self) -> bool:
+    def is_valid_move(self, from_point: int, to_point: int) -> bool:
         """Valida si un movimiento es válido."""
         return True
 
-    def make_move(self) -> bool:
+    def make_move(self, from_point: int, to_point: int) -> bool:
         """Realiza un movimiento en el tablero."""
         if not self.__started:
             raise ValueError("El juego no ha comenzado")
@@ -197,15 +189,15 @@ class BackgammonGame:
         self.__moves_count += 1
         return True
 
-    def can_player_move(self) -> bool:
+    def can_player_move(self, player: Player) -> bool:
         """Indica si el jugador puede mover."""
         return True
 
-    def must_enter_from_bar(self) -> bool:
+    def must_enter_from_bar(self, player: Player) -> bool:
         """Indica si el jugador debe entrar desde la barra."""
         return False
 
-    def can_bear_off(self) -> bool:
+    def can_bear_off(self, player: Player) -> bool:
         """Indica si el jugador puede sacar fichas del tablero."""
         return True
 
@@ -218,7 +210,7 @@ class BackgammonGame:
         return {
             "started": self.__started,
             "finished": self.__finished,
-            "current_player": self.__current_player.get_name(),
+            "current_player": self.__current_player.get_name()
         }
 
     def get_moves_count(self) -> int:
@@ -249,7 +241,7 @@ class BackgammonGame:
         self.__board.reset()
         self.__current_player = self.__player1
 
-    def get_pip_count(self) -> int:
+    def get_pip_count(self, player: Player) -> int:
         """Devuelve el pip count del jugador."""
         return 0
 
@@ -299,7 +291,7 @@ class BackgammonGame:
         """Devuelve el propietario actual del cubo de doblaje."""
         return self.__doubling_cube_owner
 
-    def can_offer_double(self) -> bool:
+    def can_offer_double(self, player: Player) -> bool:
         """Indica si el jugador puede ofrecer el doble."""
         return not self.__double_offered
 
@@ -313,7 +305,9 @@ class BackgammonGame:
 
     def save_game_state(self) -> Dict[str, Any]:
         """Guarda el estado actual del juego."""
-        return {"turn_number": self.__turn_number}
+        return {
+            "turn_number": self.__turn_number
+        }
 
     def load_game_state(self, state: Dict[str, Any]) -> None:
         """Carga el estado del juego."""
@@ -368,10 +362,7 @@ class BackgammonGame:
         """Compara dos instancias de BackgammonGame."""
         if not isinstance(other, BackgammonGame):
             return False
-        return (
-            self.__turn_number == other.__turn_number
-            and self.__started == other.__started
-        )
+        return self.__turn_number == other.__turn_number and self.__started == other.__started
 
     def __hash__(self) -> int:
         """Devuelve el hash de la instancia."""

@@ -1,27 +1,15 @@
-"""Módulo Board para Backgammon.
-
-Gestiona el estado del tablero, las fichas, la barra y las fichas fuera del tablero.
-"""
-
-from typing import List, Dict, Any, Optional
 from core.checker import Checker
-from core.player import Player
 
 class Board:
-    """Representa el tablero de Backgammon."""
+    def __init__(self):
+        self.__points = [[] for _ in range(24)]
+        self.__bar = {}
+        self.__off_board = {}
 
-    def __init__(self) -> None:
-        """Inicializa el tablero con 24 puntos, barra y fichas fuera del tablero."""
-        self.__points: List[List[Checker]] = [[] for _ in range(24)]
-        self.__bar: Dict[Player, List[Checker]] = {}
-        self.__off_board: Dict[Player, List[Checker]] = {}
-
-    def get_points(self) -> List[List[Checker]]:
-        """Devuelve la lista de puntos del tablero."""
+    def get_points(self):
         return self.__points
 
-    def setup_initial_position(self, player1: Player, player2: Player) -> None:
-        """Configura la posición inicial de las fichas en el tablero."""
+    def setup_initial_position(self, player1, player2):
         self.reset()
         self.__points[0] = [Checker(player1) for _ in range(2)]
         self.__points[11] = [Checker(player1) for _ in range(5)]
@@ -32,34 +20,28 @@ class Board:
         self.__points[7] = [Checker(player2) for _ in range(3)]
         self.__points[5] = [Checker(player2) for _ in range(5)]
 
-    def is_point_empty(self, point: int) -> bool:
-        """Indica si el punto está vacío."""
+    def is_point_empty(self, point):
         return len(self.__points[point]) == 0
 
-    def get_point_owner(self, point: int) -> Optional[Player]:
-        """Devuelve el propietario del punto."""
+    def get_point_owner(self, point):
         if not self.__points[point]:
             return None
         return self.__points[point][0].get_owner()
 
-    def get_checkers_count_on_point(self, point: int) -> int:
-        """Devuelve la cantidad de fichas en el punto."""
+    def get_checkers_count_on_point(self, point):
         if point < 0 or point > 23:
             raise ValueError("Punto inválido")
         return len(self.__points[point])
 
-    def add_checker_to_point(self, point: int, checker: Checker) -> None:
-        """Agrega una ficha al punto."""
+    def add_checker_to_point(self, point, checker):
         self.__points[point].append(checker)
 
-    def remove_checker_from_point(self, point: int) -> Checker:
-        """Remueve una ficha del punto."""
+    def remove_checker_from_point(self, point):
         if not self.__points[point]:
             raise ValueError("No hay fichas para remover")
         return self.__points[point].pop()
 
-    def can_place_checker(self, point: int, player: Player) -> bool:
-        """Indica si se puede colocar una ficha en el punto."""
+    def can_place_checker(self, point, player):
         if self.is_point_empty(point):
             return True
         owner = self.get_point_owner(point)
@@ -67,74 +49,61 @@ class Board:
             return True
         return len(self.__points[point]) == 1
 
-    def is_point_blocked(self, point: int, player: Player) -> bool:
-        """Indica si el punto está bloqueado para el jugador."""
+    def is_point_blocked(self, point, player):
         owner = self.get_point_owner(point)
         return owner is not None and owner != player and len(self.__points[point]) > 1
 
-    def has_blot(self, point: int) -> bool:
-        """Indica si el punto tiene un blot (solo una ficha)."""
+    def has_blot(self, point):
         return len(self.__points[point]) == 1
 
-    def can_hit_blot(self, point: int, player: Player) -> bool:
-        """Indica si el jugador puede golpear el blot en el punto."""
+    def can_hit_blot(self, point, player):
         owner = self.get_point_owner(point)
         return self.has_blot(point) and owner is not None and owner != player
 
-    def hit_blot(self, point: int, player: Player) -> Checker:
-        """Golpea el blot en el punto y lo remueve."""
+    def hit_blot(self, point, player):
         if not self.can_hit_blot(point, player):
             raise ValueError("No se puede golpear blot")
         return self.remove_checker_from_point(point)
 
-    def get_bar_checkers_count(self, player: Player) -> int:
-        """Devuelve la cantidad de fichas en la barra para el jugador."""
+    def get_bar_checkers_count(self, player):
         return len(self.__bar.get(player, []))
 
-    def add_checker_to_bar(self, checker: Checker) -> None:
-        """Agrega una ficha a la barra."""
+    def add_checker_to_bar(self, checker):
         owner = checker.get_owner()
         if owner not in self.__bar:
             self.__bar[owner] = []
         self.__bar[owner].append(checker)
 
-    def remove_checker_from_bar(self, player: Player) -> Checker:
-        """Remueve una ficha de la barra del jugador."""
+    def remove_checker_from_bar(self, player):
         if self.get_bar_checkers_count(player) == 0:
             raise ValueError("No hay fichas en la barra")
         return self.__bar[player].pop()
 
-    def has_checkers_on_bar(self, player: Player) -> bool:
-        """Indica si el jugador tiene fichas en la barra."""
+    def has_checkers_on_bar(self, player):
         return self.get_bar_checkers_count(player) > 0
 
-    def get_off_board_checkers_count(self, player: Player) -> int:
-        """Devuelve la cantidad de fichas fuera del tablero para el jugador."""
+    def get_off_board_checkers_count(self, player):
         return len(self.__off_board.get(player, []))
 
-    def add_checker_off_board(self, checker: Checker) -> None:
-        """Agrega una ficha fuera del tablero."""
+    def add_checker_off_board(self, checker):
         owner = checker.get_owner()
         if owner not in self.__off_board:
             self.__off_board[owner] = []
         self.__off_board[owner].append(checker)
 
-    def is_valid_point(self, point: int) -> bool:
-        """Indica si el punto es válido en el tablero."""
+    def is_valid_point(self, point):
         return 0 <= point < 24
 
-    def get_opposite_point(self, point: int) -> int:
-        """Devuelve el punto opuesto en el tablero."""
+    def get_opposite_point(self, point):
         return 23 - point
 
-    def is_in_home_board(self, point: int, player: Player) -> bool:
-        """Indica si el punto está en la zona de casa del jugador."""
+    def is_in_home_board(self, point, player):
         if player.get_color() == "white":
             return 19 <= point <= 23
-        return 0 <= point <= 5
+        else:
+            return 0 <= point <= 5
 
-    def can_bear_off(self, player: Player) -> bool:
-        """Indica si el jugador puede sacar fichas del tablero."""
+    def can_bear_off(self, player):
         if self.has_checkers_on_bar(player):
             return False
         home_points = range(19, 24) if player.get_color() == "white" else range(0, 6)
@@ -145,8 +114,7 @@ class Board:
                         return False
         return True
 
-    def get_furthest_checker(self, player: Player) -> Optional[int]:
-        """Devuelve la posición de la ficha más lejana del jugador."""
+    def get_furthest_checker(self, player):
         if player.get_color() == "white":
             for i in range(24):
                 if any(c.get_owner() == player for c in self.__points[i]):
@@ -157,51 +125,40 @@ class Board:
                     return i
         return None
 
-    def count_checkers_on_board(self, player: Player) -> int:
-        """Cuenta las fichas del jugador en el tablero."""
+    def count_checkers_on_board(self, player):
         return sum(1 for i in range(24) for c in self.__points[i] if c.get_owner() == player)
 
-    def get_all_checker_positions(self, player: Player) -> List[int]:
-        """Devuelve todas las posiciones de fichas del jugador en el tablero."""
+    def get_all_checker_positions(self, player):
         return [i for i in range(24) if any(c.get_owner() == player for c in self.__points[i])]
 
-    def clear_point(self, point: int) -> List[Checker]:
-        """Limpia el punto y devuelve las fichas que había."""
+    def clear_point(self, point):
         cleared = self.__points[point][:]
         self.__points[point] = []
         return cleared
 
-    def reset(self) -> None:
-        """Reinicia el tablero a su estado inicial."""
+    def reset(self):
         self.__points = [[] for _ in range(24)]
         self.__bar = {}
         self.__off_board = {}
 
-    def copy(self) -> "Board":
-        """Devuelve una copia profunda del tablero."""
+    def copy(self):
         import copy
         return copy.deepcopy(self)
 
-    def __str__(self) -> str:
-        """Representación en string del tablero."""
+    def __str__(self):
         return f"Board({self.__points})"
 
-    def __eq__(self, other: object) -> bool:
-        """Compara dos tableros."""
+    def __eq__(self, other):
         if not isinstance(other, Board):
             return False
-        return (self.__points == other.__points and
-                self.__bar == other.__bar and
-                self.__off_board == other.__off_board)
+        return self.__points == other.__points and self.__bar == other.__bar and self.__off_board == other.__off_board
 
-    def __hash__(self) -> int:
-        """Devuelve el hash del tablero."""
+    def __hash__(self):
         return hash((tuple(tuple(point) for point in self.__points),
                      tuple(sorted((k, tuple(v)) for k, v in self.__bar.items())),
                      tuple(sorted((k, tuple(v)) for k, v in self.__off_board.items()))))
 
-    def calculate_pip_count(self, player: Player) -> int:
-        """Calcula el pip count del jugador."""
+    def calculate_pip_count(self, player):
         pip = 0
         for i in range(24):
             for checker in self.__points[i]:
@@ -209,18 +166,23 @@ class Board:
                     pip += (24 - i) if player.get_color() == "white" else (i + 1)
         return pip
 
-    def get_moves_to_bear_off(self) -> List[Any]:
-        """Devuelve los movimientos posibles para sacar fichas del tablero."""
+    def get_moves_to_bear_off(self, player):
         return []
 
-    def is_race_position(self) -> bool:
-        """Indica si la posición es de carrera."""
+    def is_race_position(self):
+       
         players = set()
         for point in self.__points:
             for checker in point:
                 players.add(checker.get_owner())
         if len(players) != 2:
-            return True
+            return True  # Solo hay un jugador, es carrera
+
+        player1, player2 = list(players)
+        # Para white: puntos 0-23, home 19-23
+        # Para black: puntos 0-23, home 0-5
+
+        # Si algún checker blanco está en 0-18 y algún negro en 6-23, no es carrera
         white_outside_home = any(
             checker.get_owner().get_color() == "white" and not (19 <= i <= 23)
             for i, point in enumerate(self.__points)
