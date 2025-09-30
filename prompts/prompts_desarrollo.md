@@ -2366,3 +2366,36 @@ if __name__ == "__main__":
 ## Uso de la respuesta
 
 Uso del código sin modificaciones
+
+## Prompt [14]
+
+**Fecha**: 30-09-2025  
+**Modelo/Herramienta**: Github Copilot (GPT-4.1)
+**Contexto**: creación de esqueleto para cli
+
+## Prompt enviado
+
+creame un código para el archivo main para poder ejecutar el cli desde ahí
+
+### Respuesta recibida
+```
+"""Archivo principal para ejecutar el CLI de Backgammon.
+
+Este archivo permite iniciar el CLI desde la raíz del proyecto.
+"""
+
+from cli.cli import run_cli
+
+def main() -> None:
+    """
+    Ejecuta el CLI de Backgammon.
+    """
+    run_cli()
+
+if __name__ == "__main__":
+    main()
+```
+
+## Uso de la respuesta
+
+uso del código sin modificaciones.
