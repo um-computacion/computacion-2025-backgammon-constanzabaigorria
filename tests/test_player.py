@@ -1,12 +1,15 @@
+'''Tests unitarios para la clase Player.'''
 import unittest
 from core.player import Player
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class TestPlayer(unittest.TestCase):
+    '''Clase de tests para Player.'''
 
     def setUp(self):
         if Player is None:
             self.skipTest("Clase Player no implementada aún")
-        
+
         self.__player1__ = Player("Jugador1", "white")
         self.__player2__ = Player("Jugador2", "black")
 
@@ -183,9 +186,9 @@ class TestPlayer(unittest.TestCase):
         self.__player1__.add_checker_to_bar()
         self.__player1__.add_checker_off_board()
         self.__player1__.set_winner(True)
-        
+
         self.__player1__.reset()
-        
+
         self.assertEqual(self.__player1__.get_checkers_count(), 15)
         self.assertEqual(self.__player1__.get_checkers_on_bar(), 0)
         self.assertEqual(self.__player1__.get_checkers_off_board(), 0)
@@ -197,14 +200,15 @@ class TestPlayer(unittest.TestCase):
         self.__player1__.set_checkers_count(10)
         self.__player1__.set_checkers_on_bar(3)
         self.__player1__.set_checkers_off_board(2)
-        
-        total = (self.__player1__.get_checkers_count() + 
-                self.__player1__.get_checkers_on_bar() + 
-                self.__player1__.get_checkers_off_board())
-        
+
+        total = (
+            self.__player1__.get_checkers_count()
+            + self.__player1__.get_checkers_on_bar()
+            + self.__player1__.get_checkers_off_board()
+        )
+
         self.assertEqual(total, 15)
-    
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

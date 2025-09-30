@@ -2271,3 +2271,34 @@ class Player:
 
 se usa el código sin cambios verificando que funcione
 
+## Prompt [12]
+
+**Fecha**: 29-09-2025  
+**Modelo/Herramienta**: GitHub Copilot (GPT-4.1)  
+**Contexto**: corrección de código para pylint clase backgammon
+
+## Prompt enviado
+
+ayudame a corregir el problema de acceso en estas lineas del codigo: 
+def __eq__(self, other: object) -> bool:
+        """Compara dos instancias de BackgammonGame."""
+        if not isinstance(other, BackgammonGame):
+            return False
+        return self.__turn_number == other.__turn_number and self.__started == other.__started
+
+### Respuesta recibida
+```
+    def __eq__(self, other: object) -> bool:
+        """Compara dos instancias de BackgammonGame."""
+        if not isinstance(other, BackgammonGame):
+            return False
+        # Acceso seguro a atributos privados usando getters o propiedades públicas
+        return (
+            self.get_turn_number() == other.get_turn_number() and
+            self.is_started() == other.is_started()
+        )
+```
+
+## Uso de la respuesta
+
+Uso del código sin cambios

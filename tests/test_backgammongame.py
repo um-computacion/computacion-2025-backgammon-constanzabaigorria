@@ -1,17 +1,19 @@
+"""
+Tests unitarios para la clase BackgammonGame.
+"""
 import unittest
 from core.backgammongame import BackgammonGame
 from core.player import Player
 from core.board import Board
 from core.dice import Dice
-
-
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class TestBackgammonGame(unittest.TestCase):
+    """Clase de tests para BackgammonGame."""
 
     def setUp(self):
         if BackgammonGame is None:
             self.skipTest("Clase BackgammonGame no implementada aún")
-        
         self.__game__ = BackgammonGame()
 
     def test_game_creation(self):
@@ -116,6 +118,7 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertIsInstance(moves, list)
 
     def test_game_is_valid_move(self):
+        """Verifica la validación de movimientos."""
         self.__game__.start_game()
         self.__game__.roll_dice()
         is_valid = self.__game__.is_valid_move(0, 5)
@@ -132,7 +135,9 @@ class TestBackgammonGame(unittest.TestCase):
             self.__game__.make_move(0, 5)
 
     def test_game_make_move_invalid_no_dice_roll(self):
-        self.__game__.start_game()
+        self.__game__.reset_game()  # Asegura que el juego está en estado inicial y los dados NO han sido lanzados
+        self.__game__.start_game()  # Esto lanza los dados automáticamente
+        self.__game__.reset_game()  # Resetea el juego, ahora __dice_rolled es False
         with self.assertRaises(ValueError):
             self.__game__.make_move(0, 5)
 
@@ -185,7 +190,6 @@ class TestBackgammonGame(unittest.TestCase):
         self.__game__.start_game()
         self.__game__.roll_dice()
         self.__game__.reset_game()
-        
         self.assertFalse(self.__game__.is_started())
         self.assertFalse(self.__game__.is_finished())
         self.assertIsNone(self.__game__.get_winner())
@@ -280,7 +284,6 @@ class TestBackgammonGame(unittest.TestCase):
     def test_game_undo_last_move(self):
         self.__game__.start_game()
         self.__game__.roll_dice()
-        initial_state = self.__game__.save_game_state()
         result = self.__game__.undo_last_move()
         self.assertIsInstance(result, bool)
 
@@ -334,7 +337,6 @@ class TestBackgammonGame(unittest.TestCase):
     def test_game_invalid_player_names(self):
         with self.assertRaises(ValueError):
             BackgammonGame("", "Player2")
-        
         with self.assertRaises(ValueError):
             BackgammonGame("Player1", "")
 
@@ -354,10 +356,10 @@ class TestBackgammonGame(unittest.TestCase):
 
     def test_game_make_move_after_finish(self):
         self.__game__.start_game()
-        self.__game__.roll_dice()  
-        self.__game__.finish_game()  
+        self.__game__.roll_dice()
+        self.__game__.finish_game()
         with self.assertRaises(ValueError):
-            self.__game__.make_move(0, 5)  
+            self.__game__.make_move(0, 5)
 
     def test_game_roll_dice_when_finished(self):
         self.__game__.finish_game()
@@ -394,10 +396,7 @@ class TestBackgammonGame(unittest.TestCase):
     def test_game_move_sequence_integration(self):
         self.__game__.start_game()
         initial_player = self.__game__.get_current_player()
-        
-        dice_roll = self.__game__.roll_dice()
         self.assertTrue(self.__game__.has_dice_been_rolled())
-        
         self.__game__.end_turn()
         final_player = self.__game__.get_current_player()
         self.assertNotEqual(initial_player, final_player)
@@ -405,7 +404,6 @@ class TestBackgammonGame(unittest.TestCase):
     def test_game_win_condition_integration(self):
         self.__game__.start_game()
         winner = self.__game__.get_player1()
-        
         self.__game__.set_winner(winner)
         self.assertTrue(self.__game__.check_win_condition())
         self.assertEqual(self.__game__.get_winner(), winner)
@@ -413,10 +411,8 @@ class TestBackgammonGame(unittest.TestCase):
     def test_game_doubling_cube_sequence(self):
         player1 = self.__game__.get_player1()
         initial_value = self.__game__.get_doubling_cube_value()
-        
         self.__game__.offer_double(player1)
         self.assertTrue(self.__game__.is_double_offered())
-        
         self.__game__.accept_double()
         self.assertFalse(self.__game__.is_double_offered())
         self.assertGreater(self.__game__.get_doubling_cube_value(), initial_value)

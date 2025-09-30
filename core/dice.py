@@ -6,6 +6,7 @@ Define la clase Dice que representa los dados utilizados en el juego de Backgamm
 import random
 from typing import List, Tuple
 
+
 class Dice:
     """Representa los dados del juego de Backgammon."""
 

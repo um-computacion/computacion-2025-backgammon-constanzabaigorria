@@ -1,6 +1,6 @@
 """Módulo principal del juego Backgammon.
 
-Esta clase orquesta el juego de Backgammon, gestionando jugadores, tablero, dados y lógica principal.
+Esta clase maneja el juego de Backgammon, gestionando jugadores, tablero, dados y lógica principal.
 """
 
 from typing import Optional, List, Dict, Any
@@ -118,7 +118,9 @@ class BackgammonGame:
         return self.__started
 
     def start_game(self) -> None:
-        """Inicia el juego."""
+        """
+        Inicia el juego, resetea el estado y lanza los dados automáticamente.
+        """
         self.__started = True
         self.__finished = False
         self.__winner = None
@@ -129,6 +131,7 @@ class BackgammonGame:
         self.__move_history.clear()
         self.__board.reset()
         self.__current_player = self.__player1
+        self.roll_dice()  # Lanza los dados automáticamente al iniciar el juego
 
     def is_finished(self) -> bool:
         """Indica si el juego ha finalizado."""
@@ -151,7 +154,10 @@ class BackgammonGame:
 
     def switch_player(self) -> None:
         """Cambia el jugador actual."""
-        self.__current_player = self.__player2 if self.__current_player == self.__player1 else self.__player1
+        if self.__current_player == self.__player1:
+            self.__current_player = self.__player2
+        else:
+            self.__current_player = self.__player1
 
     def roll_dice(self) -> tuple:
         """Lanza los dados y devuelve el resultado."""
@@ -175,11 +181,29 @@ class BackgammonGame:
         return []
 
     def is_valid_move(self, from_point: int, to_point: int) -> bool:
-        """Valida si un movimiento es válido."""
+        """
+        Valida si un movimiento es válido.
+
+        Args:
+            from_point (int): Punto de origen.
+            to_point (int): Punto de destino.
+
+        Returns:
+            bool: True si el movimiento es válido, False en caso contrario.
+        """
         return True
 
     def make_move(self, from_point: int, to_point: int) -> bool:
-        """Realiza un movimiento en el tablero."""
+        """
+        Realiza un movimiento en el tablero.
+
+        Args:
+            from_point (int): Punto de origen.
+            to_point (int): Punto de destino.
+
+        Returns:
+            bool: True si el movimiento fue realizado, False en caso contrario.
+        """
         if not self.__started:
             raise ValueError("El juego no ha comenzado")
         if self.__finished:
@@ -190,15 +214,39 @@ class BackgammonGame:
         return True
 
     def can_player_move(self, player: Player) -> bool:
-        """Indica si el jugador puede mover."""
+        """
+        Indica si el jugador puede mover.
+
+        Args:
+            player (Player): El jugador a consultar.
+
+        Returns:
+            bool: True si puede mover, False en caso contrario.
+        """
         return True
 
     def must_enter_from_bar(self, player: Player) -> bool:
-        """Indica si el jugador debe entrar desde la barra."""
+        """
+        Indica si el jugador debe entrar desde la barra.
+
+        Args:
+            player (Player): El jugador a consultar.
+
+        Returns:
+            bool: True si debe entrar desde la barra, False en caso contrario.
+        """
         return False
 
     def can_bear_off(self, player: Player) -> bool:
-        """Indica si el jugador puede sacar fichas del tablero."""
+        """
+        Indica si el jugador puede sacar fichas del tablero.
+
+        Args:
+            player (Player): El jugador a consultar.
+
+        Returns:
+            bool: True si puede sacar fichas, False en caso contrario.
+        """
         return True
 
     def check_win_condition(self) -> bool:
@@ -242,8 +290,28 @@ class BackgammonGame:
         self.__current_player = self.__player1
 
     def get_pip_count(self, player: Player) -> int:
-        """Devuelve el pip count del jugador."""
-        return 0
+        """
+        Devuelve el pip count del jugador.
+
+        Args:
+            player (Player): El jugador para el que se calcula el pip count.
+
+        Returns:
+            int: Pip count del jugador (suma de las distancias de todas sus fichas al final).
+        """
+        pip_count = 0
+        checkers = (
+            self.__player1_checkers if player == self.__player1 else self.__player2_checkers
+        )
+        for checker in checkers:
+            if checker.is_on_board():
+                pos = checker.get_position()
+                if pos is not None:
+                    if player.get_color() == "white":
+                        pip_count += 24 - pos
+                    else:
+                        pip_count += pos + 1
+        return pip_count
 
     def is_race_position(self) -> bool:
         """Indica si la posición es de carrera."""
@@ -292,7 +360,16 @@ class BackgammonGame:
         return self.__doubling_cube_owner
 
     def can_offer_double(self, player: Player) -> bool:
-        """Indica si el jugador puede ofrecer el doble."""
+        """
+        Indica si el jugador puede ofrecer el doble.
+
+        Args:
+            player (Player): El jugador que desea ofrecer el doble.
+
+        Returns:
+            bool: True si el jugador puede ofrecer el doble, False en caso contrario.
+        """
+        # Ejemplo simple: solo se puede ofrecer si no está ofrecido actualmente
         return not self.__double_offered
 
     def get_game_type(self) -> str:
@@ -362,7 +439,11 @@ class BackgammonGame:
         """Compara dos instancias de BackgammonGame."""
         if not isinstance(other, BackgammonGame):
             return False
-        return self.__turn_number == other.__turn_number and self.__started == other.__started
+        # Acceso seguro a atributos privados usando getters o propiedades públicas
+        return (
+            self.get_turn_number() == other.get_turn_number() and
+            self.is_started() == other.is_started()
+        )
 
     def __hash__(self) -> int:
         """Devuelve el hash de la instancia."""
