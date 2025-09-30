@@ -1,14 +1,16 @@
+'''Tests unitarios para la clase Checker.'''
 import unittest
 from core.checker import Checker
 from core.player import Player
-
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class TestChecker(unittest.TestCase):
+    '''Clase de tests para Checker.'''
 
     def setUp(self):
         if Checker is None or Player is None:
             self.skipTest("Clase Checker o Player no implementada aún")
-        
+
         self.__player1__ = Player("Jugador1", "white")
         self.__player2__ = Player("Jugador2", "black")
         self.__checker1__ = Checker(self.__player1__)
@@ -173,9 +175,9 @@ class TestChecker(unittest.TestCase):
         self.__checker1__.set_position(5)
         self.__checker1__.set_on_bar(True)
         self.__checker1__.set_off_board(True)
-        
+
         self.__checker1__.reset_position()
-        
+
         self.assertIsNone(self.__checker1__.get_position())
         self.assertFalse(self.__checker1__.is_on_bar())
         self.assertFalse(self.__checker1__.is_off_board())
@@ -255,12 +257,14 @@ class TestChecker(unittest.TestCase):
     def test_checker_clone(self):
         self.__checker1__.set_position(5)
         self.__checker1__.set_on_bar(True)
-        
+
         cloned_checker = self.__checker1__.clone()
-        
+
         self.assertIsNot(cloned_checker, self.__checker1__)
         self.assertEqual(cloned_checker.get_owner(), self.__checker1__.get_owner())
-        self.assertEqual(cloned_checker.get_position(), self.__checker1__.get_position())
+        self.assertEqual(
+            cloned_checker.get_position(), self.__checker1__.get_position()
+        )
         self.assertEqual(cloned_checker.is_on_bar(), self.__checker1__.is_on_bar())
 
     def test_checker_string_representation(self):
@@ -337,7 +341,7 @@ class TestChecker(unittest.TestCase):
         self.__checker1__.move_to_bar()
         self.__checker1__.move_to_position(10)
         self.__checker1__.move_off_board()
-        
+
         self.assertIsNone(self.__checker1__.get_position())
         self.assertFalse(self.__checker1__.is_on_board())
         self.assertFalse(self.__checker1__.is_on_bar())
@@ -347,10 +351,10 @@ class TestChecker(unittest.TestCase):
         self.__checker1__.set_position(0)
         distance_to_end = self.__checker1__.get_distance_to_position(23)
         self.assertEqual(distance_to_end, 23)
-        
+
         distance_to_start = self.__checker1__.get_distance_to_position(0)
         self.assertEqual(distance_to_start, 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

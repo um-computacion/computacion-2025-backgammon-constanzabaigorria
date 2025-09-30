@@ -1,14 +1,17 @@
+'''Tests unitarios para la clase Board.'''
 import unittest
 from core.board import Board
 from core.checker import Checker
 from core.player import Player
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class TestBoard(unittest.TestCase):
+    '''Clase de tests para Board.'''
 
     def setUp(self):
         if Board is None or Player is None:
             self.skipTest("Clase Board o Player no implementada aún")
-        
+
         self.__player1__ = Player("Jugador1", "white")
         self.__player2__ = Player("Jugador2", "black")
         self.__board__ = Board()
@@ -28,7 +31,7 @@ class TestBoard(unittest.TestCase):
     def test_board_initial_setup(self):
         self.__board__.setup_initial_position(self.__player1__, self.__player2__)
         points = self.__board__.get_points()
-        
+
         self.assertEqual(len(points[0]), 2)
         self.assertEqual(len(points[11]), 5)
         self.assertEqual(len(points[16]), 3)
@@ -176,12 +179,16 @@ class TestBoard(unittest.TestCase):
         self.assertFalse(self.__board__.has_checkers_on_bar(self.__player1__))
 
     def test_board_get_off_board_checkers_count_initial(self):
-        self.assertEqual(self.__board__.get_off_board_checkers_count(self.__player1__), 0)
+        self.assertEqual(
+            self.__board__.get_off_board_checkers_count(self.__player1__), 0
+        )
 
     def test_board_add_checker_off_board(self):
         checker = Checker(self.__player1__)
         self.__board__.add_checker_off_board(checker)
-        self.assertEqual(self.__board__.get_off_board_checkers_count(self.__player1__), 1)
+        self.assertEqual(
+            self.__board__.get_off_board_checkers_count(self.__player1__), 1
+        )
 
     def test_board_is_valid_point_true(self):
         self.assertTrue(self.__board__.is_valid_point(0))
@@ -256,7 +263,7 @@ class TestBoard(unittest.TestCase):
         checker2 = Checker(self.__player1__)
         self.__board__.add_checker_to_point(5, checker1)
         self.__board__.add_checker_to_point(10, checker2)
-        
+
         positions = self.__board__.get_all_checker_positions(self.__player1__)
         self.assertIn(5, positions)
         self.assertIn(10, positions)
@@ -267,7 +274,7 @@ class TestBoard(unittest.TestCase):
         checker2 = Checker(self.__player1__)
         self.__board__.add_checker_to_point(5, checker1)
         self.__board__.add_checker_to_point(5, checker2)
-        
+
         cleared_checkers = self.__board__.clear_point(5)
         self.assertEqual(len(cleared_checkers), 2)
         self.assertTrue(self.__board__.is_point_empty(5))
@@ -279,20 +286,22 @@ class TestBoard(unittest.TestCase):
     def test_board_reset_board(self):
         self.__board__.setup_initial_position(self.__player1__, self.__player2__)
         self.__board__.reset()
-        
+
         for i in range(24):
             self.assertTrue(self.__board__.is_point_empty(i))
-        
+
         self.assertEqual(self.__board__.get_bar_checkers_count(self.__player1__), 0)
         self.assertEqual(self.__board__.get_bar_checkers_count(self.__player2__), 0)
 
     def test_board_copy_board(self):
         self.__board__.setup_initial_position(self.__player1__, self.__player2__)
         board_copy = self.__board__.copy()
-        
+
         self.assertIsNot(board_copy, self.__board__)
-        self.assertEqual(board_copy.get_checkers_count_on_point(0), 
-                        self.__board__.get_checkers_count_on_point(0))
+        self.assertEqual(
+            board_copy.get_checkers_count_on_point(0),
+            self.__board__.get_checkers_count_on_point(0),
+        )
 
     def test_board_string_representation(self):
         board_str = str(self.__board__)
@@ -320,7 +329,7 @@ class TestBoard(unittest.TestCase):
     def test_board_invalid_point_operations(self):
         with self.assertRaises(ValueError):
             self.__board__.get_checkers_count_on_point(-1)
-        
+
         with self.assertRaises(ValueError):
             self.__board__.get_checkers_count_on_point(24)
 
@@ -338,7 +347,7 @@ class TestBoard(unittest.TestCase):
         for i in range(19, 24):
             checker = Checker(self.__player1__)
             self.__board__.add_checker_to_point(i, checker)
-        
+
         moves = self.__board__.get_moves_to_bear_off(self.__player1__)
         self.assertIsInstance(moves, list)
 
@@ -346,16 +355,17 @@ class TestBoard(unittest.TestCase):
         for i in range(19, 24):
             checker = Checker(self.__player1__)
             self.__board__.add_checker_to_point(i, checker)
-        
+
         for i in range(0, 6):
             checker = Checker(self.__player2__)
             self.__board__.add_checker_to_point(i, checker)
-        
+
         self.assertTrue(self.__board__.is_race_position())
 
     def test_board_is_race_position_false(self):
         self.__board__.setup_initial_position(self.__player1__, self.__player2__)
         self.assertFalse(self.__board__.is_race_position())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

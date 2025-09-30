@@ -56,7 +56,7 @@ class Player:
 
     def set_checkers_count(self, count: int) -> None:
         """Establece la cantidad de fichas del jugador."""
-        if not (0 <= count <= 15):
+        if not 0 <= count <= 15:
             raise ValueError("Cantidad de fichas inválida")
         self.__checkers_count = count
 
@@ -138,7 +138,8 @@ class Player:
         """Compara dos jugadores."""
         if not isinstance(other, Player):
             return False
-        return self.__name == other.__name and self.__color == other.__color
+        # Comparación usando getters para respetar el encapsulamiento
+        return self.get_name() == other.get_name() and self.get_color() == other.get_color()
 
     def __hash__(self) -> int:
         """Devuelve el hash del jugador."""
