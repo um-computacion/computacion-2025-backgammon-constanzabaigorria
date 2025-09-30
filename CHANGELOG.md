@@ -11,6 +11,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Se corrigió el archivo `core/checker.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
 - Se corrigió el archivo `core/dice.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
 - Se corrigió el archivo `core/player.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
+- Se creó un esqueleto de CLI en `cli/cli.py` para Backgammon, con renderizado básico de tablero y preparado para futuras extensiones.
 
 ## [Sprint 2] – 2025-09-17
 
