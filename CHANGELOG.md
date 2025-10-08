@@ -4,6 +4,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Se crearon los tests completos para el CLI en `tests/test_cli.py`, siguiendo SOLID, TDD, PEP 8, PEP 257 y PEP 484.
+
+## [Sprint 3] – 2025-10-01
+
+### Added
 - Se agregó la importación de la clase `Checker` en `core/backgammongame.py`.
 - Se crearon listas de fichas para cada jugador y método para inicializar la posición de las fichas usando objetos `Checker`.
 - Se corrigió el archivo `core/backgammongame.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
@@ -12,6 +17,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Se corrigió el archivo `core/dice.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
 - Se corrigió el archivo `core/player.py` para cumplir con PEP8, PEP257, PEP484 y obtener lo más cercano a 10/10 en pylint.
 - Se creó un esqueleto de CLI en `cli/cli.py` para Backgammon, con renderizado básico de tablero y preparado para futuras extensiones.
+
 
 ## [Sprint 2] – 2025-09-17
 
