@@ -26,7 +26,7 @@ class BackgammonGame:
             raise ValueError("Los nombres de los jugadores deben ser distintos")
         self.__player1: Player = Player(player1_name, "white")
         self.__player2: Player = Player(player2_name, "black")
-        self.__board: Board = Board()
+        self.__board: Board = Board()  # Cambiado de self.board a self.__board
         self.__dice: Dice = Dice()
         self.__current_player: Player = self.__player1
         self.__started: bool = False
@@ -44,6 +44,7 @@ class BackgammonGame:
         self.__game_type: str = "single"
         self.__player1_checkers: List[Checker] = [Checker(self.__player1) for _ in range(15)]
         self.__player2_checkers: List[Checker] = [Checker(self.__player2) for _ in range(15)]
+        self.setup_initial_position()
 
     def setup_initial_position(self) -> None:
         """Configura la posición inicial del tablero y las fichas usando objetos Checker."""
@@ -118,9 +119,7 @@ class BackgammonGame:
         return self.__started
 
     def start_game(self) -> None:
-        """
-        Inicia el juego, resetea el estado y lanza los dados automáticamente.
-        """
+        """Inicia el juego."""
         self.__started = True
         self.__finished = False
         self.__winner = None
@@ -131,7 +130,6 @@ class BackgammonGame:
         self.__move_history.clear()
         self.__board.reset()
         self.__current_player = self.__player1
-        self.roll_dice()  # Lanza los dados automáticamente al iniciar el juego
 
     def is_finished(self) -> bool:
         """Indica si el juego ha finalizado."""
@@ -210,6 +208,14 @@ class BackgammonGame:
             raise ValueError("El juego ha finalizado")
         if not self.__dice_rolled:
             raise ValueError("Debe tirar los dados antes de mover")
+        # Verifica que haya fichas en el punto de origen
+        if not hasattr(self.__board, "points"):
+            raise AttributeError("El tablero no tiene el atributo 'points'")
+        if not self.__board.points[from_point - 1]:
+            raise ValueError("No hay fichas en el punto de origen")
+        # Mueve la ficha
+        checker = self.__board.points[from_point - 1].pop()
+        self.__board.points[to_point - 1].append(checker)
         self.__moves_count += 1
         return True
 
