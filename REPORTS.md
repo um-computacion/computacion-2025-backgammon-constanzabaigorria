@@ -17,7 +17,6 @@ TOTAL                      625     53    174     16    88%
 ## Pylint Report
 ```text
 ************* Module core.checker
-core/checker.py:205:0: C0304: Final newline missing (missing-final-newline)
 core/checker.py:128:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
 core/checker.py:141:8: R1705: Unnecessary "else" after "return", remove the "else" and de-indent the code inside it (no-else-return)
 core/checker.py:8:0: R0904: Too many public methods (25/20) (too-many-public-methods)
@@ -34,13 +33,16 @@ core/backgammongame.py:240:27: W0613: Unused argument 'player' (unused-argument)
 core/backgammongame.py:362:31: W0613: Unused argument 'player' (unused-argument)
 core/backgammongame.py:12:0: R0904: Too many public methods (55/20) (too-many-public-methods)
 ************* Module core.board
-core/board.py:257:0: C0304: Final newline missing (missing-final-newline)
 core/board.py:224:36: W0613: Unused argument 'player' (unused-argument)
 core/board.py:11:0: R0904: Too many public methods (33/20) (too-many-public-methods)
 ************* Module core.player
-core/player.py:155:0: C0304: Final newline missing (missing-final-newline)
 core/player.py:9:0: R0902: Too many instance attributes (8/7) (too-many-instance-attributes)
 core/player.py:9:0: R0904: Too many public methods (23/20) (too-many-public-methods)
+************* Module tests.test_cli
+tests/test_cli.py:300:45: W0613: Unused argument 'mock_stdout' (unused-argument)
+tests/test_cli.py:307:45: W0613: Unused argument 'mock_stdout' (unused-argument)
+tests/test_cli.py:349:43: W0613: Unused argument 'mock_stdout' (unused-argument)
+tests/test_cli.py:355:39: W0613: Unused argument 'mock_stdout' (unused-argument)
 ************* Module tests.test_checker
 tests/test_checker.py:7:0: R0904: Too many public methods (73/20) (too-many-public-methods)
 ************* Module tests.test_player
@@ -53,7 +55,7 @@ tests/test_backgammongame.py:11:0: R0904: Too many public methods (79/20) (too-m
 tests/test_board.py:8:0: R0904: Too many public methods (67/20) (too-many-public-methods)
 
 -----------------------------------
-Your code has been rated at 9.85/10
+Your code has been rated at 9.86/10
 
 
 ```
