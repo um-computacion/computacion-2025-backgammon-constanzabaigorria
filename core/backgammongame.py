@@ -128,7 +128,10 @@ class BackgammonGame:
         self.__dice_rolled = False
         self.__last_dice_roll = None
         self.__move_history.clear()
-        self.__board.reset()
+        # Solo resetear el tablero si no tiene fichas
+        if not any(self.__board.get_points()):
+            self.__board.reset()
+            self.setup_initial_position()
         self.__current_player = self.__player1
 
     def is_finished(self) -> bool:
@@ -211,6 +214,7 @@ class BackgammonGame:
         # Verifica que haya fichas en el punto de origen
         if not hasattr(self.__board, "points"):
             raise AttributeError("El tablero no tiene el atributo 'points'")
+        
         if not self.__board.points[from_point - 1]:
             raise ValueError("No hay fichas en el punto de origen")
         # Mueve la ficha
