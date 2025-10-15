@@ -10,7 +10,7 @@ def main() -> None:
     Presenta un menú al usuario para elegir entre CLI o Pygame UI.
     """
     print("=" * 60)
-    print("\n  🎲  BACKGAMMON")
+    print("\n BACKGAMMON")
     print("\nElige una interfaz:")
     print("  1. CLI (Línea de comandos)")
     print("  2. Pygame UI (Interfaz gráfica)")
@@ -27,9 +27,9 @@ def main() -> None:
             from pygame_ui.pygame_ui import main as run_pygame_ui
             run_pygame_ui()
         except ImportError:
-            print("❌ Pygame UI no disponible. Usa CLI (opción 1).")
+            print("Pygame UI no disponible. Usa CLI (opción 1).")
     else:
-        print("\n❌ Opción inválida. Ejecuta el programa nuevamente y elige 1 o 2.")
+        print("\nOpción inválida. Ejecuta el programa nuevamente y elige 1 o 2.")
 
 
 if __name__ == "__main__":
