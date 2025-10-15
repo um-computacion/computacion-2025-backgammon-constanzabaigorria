@@ -15,9 +15,7 @@ def main() -> None:
     print("  1. CLI (Línea de comandos)")
     print("  2. Pygame UI (Interfaz gráfica)")
     print("\nIngresa tu elección (1 o 2): ", end="")
-    
     choice = input().strip()
-    
     if choice == "1":
         print("\nIniciando modo CLI...\n")
         run_cli()
