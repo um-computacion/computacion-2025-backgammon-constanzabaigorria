@@ -2891,3 +2891,101 @@ Se solucionó el problema mejorando:
 - Validación de entrada vacía y manejo de errores más robusto
 - Verificaciones de estado del juego antes de permitir movimientos
 
+## Prompt [19]
+
+**Fecha**: 15-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: implementación del cambio automático de jugadores
+
+## Prompt enviado
+
+por qué no cambia nunca de jugador desp de cada turno? 
+
+### Respuesta recibida
+
+```python
+def __init__(self, game: Optional[BackgammonGame] = None) -> None:
+    """
+    Inicializa la interfaz CLI con un juego existente o uno nuevo.
+
+    Args:
+        game (Optional[BackgammonGame]): Instancia de juego a utilizar.
+    """
+    self._game_: BackgammonGame = game or BackgammonGame()
+    self._running_ = False
+    self._moves_remaining_ = 0
+
+def _cmd_roll_(self) -> None:
+    """Maneja el comando de tirar dados."""
+    # ... código existente ...
+    try:
+        dice = self._game_.roll_dice()
+        self._display_dice_(dice)
+        # Calcular movimientos disponibles
+        if isinstance(dice, (list, tuple)) and len(dice) >= 2:
+            if dice[0] == dice[1]:  # Doble
+                self._moves_remaining_ = 4
+            else:
+                self._moves_remaining_ = 2
+        else:
+            self._moves_remaining_ = 2
+        
+        print(f" Movimientos disponibles: {self._moves_remaining_}")
+        print("  Ahora puedes usar 'move' para hacer un movimiento")
+    except Exception as e:
+        print(f" Error al tirar dados: {e}")
+
+def _cmd_move_(self) -> None:
+    """Maneja el comando de hacer un movimiento."""
+    # ... código existente ...
+    success = self._game_.make_move(from_point, to_point)
+    if success:
+        print(f"\n Movimiento exitoso: {from_point} → {to_point}")
+        self._moves_remaining_ -= 1
+        print(f" Movimientos restantes: {self._moves_remaining_}")
+        
+        self._display_board_()
+        
+        # Verificar si se completaron todos los movimientos
+        if self._moves_remaining_ <= 0:
+            print("\n  ✓ Todos los movimientos completados. Cambiando de jugador...")
+            try:
+                self._game_.end_turn()
+                print("  ✓ Turno terminado")
+            except Exception as e:
+                print(f"  Error al terminar turno: {e}")
+            self._display_board_()
+        
+        # Verificar si hay ganador
+        if self._game_.is_finished():
+            winner = self._game_.get_winner()
+            if winner:
+                self._display_winner_(str(winner))
+                self._running_ = False
+    else:
+        print("\n Movimiento inválido. Intenta de nuevo.")
+
+def _cmd_status_(self) -> None:
+    """Muestra el estado actual del juego."""
+    # ... código existente ...
+    # Mostrar estado de dados
+    if self._game_.has_dice_been_rolled():
+        dice = self._game_.get_last_dice_roll()
+        print(f"  ║  Dados: {dice[0]}, {dice[1]}" + " " * 8 + "║")
+    else:
+        print("  ║  Dados: Aún no tirados" + " " * 7 + "║")
+    
+    # Mostrar movimientos restantes
+    print(f"  ║  Movimientos restantes: {self._moves_remaining_}" + " " * 8 + "║")
+```
+
+### Uso de la respuesta
+
+Se implementó el cambio automático de jugadores:
+- Se agregó `_moves_remaining_` para rastrear movimientos disponibles
+- Se calculan correctamente los movimientos (2 normales, 4 si es doble)
+- Se decrementa el contador después de cada movimiento exitoso
+- Se cambia automáticamente de jugador cuando se completan todos los movimientos
+- Se mejoró el comando `status` para mostrar movimientos restantes y estado de dados
+- Se corrigió el formato del estado del juego para mostrar jugador y color correctamente
+

@@ -214,7 +214,6 @@ class BackgammonGame:
         # Verifica que haya fichas en el punto de origen
         if not hasattr(self.__board, "points"):
             raise AttributeError("El tablero no tiene el atributo 'points'")
-        
         if not self.__board.points[from_point - 1]:
             raise ValueError("No hay fichas en el punto de origen")
         # Mueve la ficha

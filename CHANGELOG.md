@@ -8,6 +8,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Se implementó una visualización completa del tablero de Backgammon en formato ASCII
 - Se agregó manejo automático de inicialización del juego en el CLI
 - Se mejoró el manejo de entrada de datos del usuario con validaciones robustas
+- Se implementó cambio automático de jugadores después de completar movimientos
+- Se agregó seguimiento de movimientos restantes en el CLI
 - Se solucionó el error "El juego no ha comenzado" agregando inicialización automática
 - Se corrigió el error "No hay fichas en el punto de origen" mejorando el manejo de entrada
 - Se mejoró la visualización del tablero para mostrar correctamente las fichas en la barra
