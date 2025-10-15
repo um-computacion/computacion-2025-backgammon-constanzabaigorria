@@ -2550,3 +2550,344 @@ class CLIInterface:
 ## Uso de la respuesta
 
 se usa el código sin modificaciones
+
+## Prompt [16]
+
+**Fecha**: 14-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: creación de visualización del tablero de Backgammon
+
+## Prompt enviado
+
+agrega la visualización del tablero para el CLI
+
+### Respuesta recibida
+
+```python
+def _display_board_visualization_(self, board) -> None:
+    """
+    Muestra una visualización completa del tablero de Backgammon.
+    
+    Args:
+        board: Instancia del tablero
+    """
+    # Obtener información del tablero
+    points = board.get_points()
+    bar = board.get_bar()
+    bear_off = board.get_off_board()
+    
+    # Contar fichas por color en cada punto
+    white_points = {}
+    black_points = {}
+    
+    for i, point in enumerate(points):
+        white_count = sum(1 for checker in point if checker.get_owner().get_color() == "white")
+        black_count = sum(1 for checker in point if checker.get_owner().get_color() == "black")
+        
+        if white_count > 0:
+            white_points[i] = white_count
+        if black_count > 0:
+            black_points[i] = black_count
+    
+    # Contar fichas en la barra
+    white_bar = 0
+    black_bar = 0
+    
+    # La barra puede usar objetos Player como claves
+    for key, checkers in bar.items():
+        if isinstance(key, str):
+            if key == "white":
+                white_bar = len(checkers)
+            elif key == "black":
+                black_bar = len(checkers)
+        else:
+            # Es un objeto Player
+            if hasattr(key, 'get_color'):
+                color = key.get_color()
+                if color == "white":
+                    white_bar = len(checkers)
+                elif color == "black":
+                    black_bar = len(checkers)
+    
+    # Contar fichas fuera del tablero
+    white_off = 0
+    black_off = 0
+    
+    # Bear off puede usar objetos Player como claves
+    for key, checkers in bear_off.items():
+        if isinstance(key, str):
+            if key == "white":
+                white_off = len(checkers)
+            elif key == "black":
+                black_off = len(checkers)
+        else:
+            # Es un objeto Player
+            if hasattr(key, 'get_color'):
+                color = key.get_color()
+                if color == "white":
+                    white_off = len(checkers)
+                elif color == "black":
+                    black_off = len(checkers)
+    
+    # Mostrar el tablero
+    print("\n  " + "═" * 58)
+    print("  │ 13  14  15  16  17  18 │ BAR │ 19  20  21  22  23  24 │")
+    print("  │" + "─" * 20 + "│" + "─" * 5 + "│" + "─" * 20 + "│")
+    
+    # Fila superior (puntos 13-18 y 19-24)
+    top_row = "  │"
+    for i in range(12, 18):  # Índices 12-17 (puntos 13-18)
+        if i in white_points:
+            top_row += f" W{white_points[i]:2d}"
+        elif i in black_points:
+            top_row += f" B{black_points[i]:2d}"
+        else:
+            top_row += "   ·"
+    top_row += " │"
+    
+    # Barra central
+    if white_bar > 0 and black_bar > 0:
+        top_row += f"W{white_bar}B{black_bar}"
+    elif white_bar > 0:
+        top_row += f"W{white_bar:2d} "
+    elif black_bar > 0:
+        top_row += f"B{black_bar:2d} "
+    else:
+        top_row += "   ·"
+    top_row += "│"
+    
+    for i in range(18, 24):  # Puntos 19-24
+        if i in white_points:
+            top_row += f" W{white_points[i]:2d}"
+        elif i in black_points:
+            top_row += f" B{black_points[i]:2d}"
+        else:
+            top_row += "   ·"
+    top_row += " │"
+    
+    print(top_row)
+    
+    # Línea divisoria
+    print("  │" + "─" * 20 + "│" + "─" * 5 + "│" + "─" * 20 + "│")
+    
+    # Fila inferior (puntos 12-7 y 6-1)
+    bottom_row = "  │"
+    for i in range(11, 5, -1):  # Puntos 12-7
+        if i in white_points:
+            bottom_row += f" W{white_points[i]:2d}"
+        elif i in black_points:
+            bottom_row += f" B{black_points[i]:2d}"
+        else:
+            bottom_row += "   ·"
+    bottom_row += " │"
+    
+    # Barra central (vacía en la fila inferior)
+    bottom_row += "   ·│"
+    
+    for i in range(5, -1, -1):  # Puntos 6-1
+        if i in white_points:
+            bottom_row += f" W{white_points[i]:2d}"
+        elif i in black_points:
+            bottom_row += f" B{black_points[i]:2d}"
+        else:
+            bottom_row += "   ·"
+    bottom_row += " │"
+    
+    print(bottom_row)
+    print("  │ 12  11  10   9   8   7 │     │  6   5   4   3   2   1 │")
+    print("  " + "═" * 58)
+    
+    # Mostrar fichas fuera del tablero
+    print(f"\n  Fuera del tablero: Blanco: {white_off} | Negro: {black_off}")
+    
+    # Mostrar información adicional
+    if white_bar > 0 or black_bar > 0:
+        print(f"  Fichas en la barra: Blanco: {white_bar} | Negro: {black_bar}")
+
+def _display_simple_board_(self) -> None:
+    """Muestra una visualización simple del tablero como fallback."""
+    print("\n  ┌─ Puntos 13-24 ─┬─ BAR ─┬─ Puntos 19-24 ─┐")
+    print("  │                │       │                │")
+    print("  │  [Fichas aquí] │ W:0|B:0│  [Fichas aquí] │")
+    print("  │                │       │                │")
+    print("  └────────────────┴───────┴────────────────┘")
+    print("  ┌────────────────┬───────┬────────────────┐")
+    print("  │                │       │                │")
+    print("  │  [Fichas aquí] │       │  [Fichas aquí] │")
+    print("  │                │       │                │")
+    print("  └─ Puntos 12-1  ─┴───────┴─ Puntos 6-1  ──┘")
+    print("\n Fuera del tablero → Blanco: 0 | Negro: 0")
+```
+
+### Uso de la respuesta
+
+Se integró la visualización completa del tablero en el CLI, incluyendo:
+- Visualización ASCII del tablero con puntos numerados del 1 al 24
+- Fichas blancas (W) y negras (B) con contadores
+- Barra central para fichas capturadas
+- Zonas de casa claramente identificadas
+- Información sobre fichas fuera del tablero
+- Fallback a visualización simple en caso de errores
+
+## Prompt [17]
+
+**Fecha**: 14-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: solución del error "El juego no ha comenzado"
+
+## Prompt enviado
+
+por que sale este error?
+
+### Respuesta recibida
+
+```python
+def run(self) -> None:
+    """
+    Ejecuta el loop principal del CLI.
+    
+    Maneja la interacción con el usuario y el flujo del juego.
+    """
+    self._running_ = True
+    self._display_welcome_()
+    
+    # Iniciar el juego automáticamente
+    try:
+        self._game_.start_game()
+        print("\n  ✓ Juego iniciado")
+    except Exception as e:
+        print(f"\n  Error al iniciar juego: {e}")
+    
+    self._display_board_()
+    
+    while self._running_:
+        # ... resto del código
+
+def _cmd_roll_(self) -> None:
+    """Maneja el comando de tirar dados."""
+    # Verificar si el juego ha comenzado
+    if not self._game_.is_started():
+        print("\n  ⚠️  El juego no ha comenzado. Iniciando juego...")
+        try:
+            self._game_.start_game()
+            print("  ✓ Juego iniciado")
+        except Exception as e:
+            print(f"  Error al iniciar juego: {e}")
+            return
+    
+    try:
+        dice = self._game_.roll_dice()
+        self._display_dice_(dice)
+        # Mostrar movimientos disponibles
+        moves = len(dice) if isinstance(dice, (list, tuple)) else 2
+        print(f" Movimientos disponibles: {moves}")
+        print("  Ahora puedes usar 'move' para hacer un movimiento")
+    except Exception as e:
+        print(f" Error al tirar dados: {e}")
+
+def _cmd_move_(self) -> None:
+    """Maneja el comando de hacer un movimiento."""
+    print("\n Movimiento:")
+    
+    # Verificar si el juego ha comenzado
+    if not self._game_.is_started():
+        print("\n  ⚠️  El juego no ha comenzado. Usa 'roll' para tirar dados primero.")
+        return
+    
+    # Verificar si los dados han sido tirados
+    if not self._game_.has_dice_been_rolled():
+        print("\n  ⚠️  Debes tirar los dados antes de mover. Usa 'roll'.")
+        return
+    
+    # ... resto del código de movimiento
+```
+
+### Uso de la respuesta
+
+Se solucionó el error agregando:
+- Inicialización automática del juego en el método `run()`
+- Verificaciones de estado del juego en los comandos `roll` y `move`
+- Mensajes informativos para el usuario sobre el estado del juego
+- Manejo de errores mejorado
+
+## Prompt [18]
+
+**Fecha**: 14-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: solución del error "No hay fichas en el punto de origen"
+
+## Prompt enviado
+
+ahora me dice que no hay fichas en el punto de origen
+
+### Respuesta recibida
+
+```python
+def start_game(self) -> None:
+    """Inicia el juego."""
+    self.__started = True
+    self.__finished = False
+    self.__winner = None
+    self.__turn_number = 1
+    self.__moves_count = 0
+    self.__dice_rolled = False
+    self.__last_dice_roll = None
+    self.__move_history.clear()
+    # Solo resetear el tablero si no tiene fichas
+    if not any(self.__board.get_points()):
+        self.__board.reset()
+        self.setup_initial_position()
+    self.__current_player = self.__player1
+
+def _get_integer_input_(
+    self, 
+    prompt: str, 
+    min_value: Optional[int] = None, 
+    max_value: Optional[int] = None
+) -> Optional[int]:
+    """
+    Solicita un número entero con validación.
+    
+    Args:
+        prompt: Mensaje a mostrar
+        min_value: Valor mínimo aceptado
+        max_value: Valor máximo aceptado
+        
+    Returns:
+        Número ingresado o None si es inválido
+    """
+    while True:
+        try:
+            user_input = input(prompt).strip()
+            if not user_input:
+                print(" Por favor ingrese un número")
+                continue
+                
+            value = int(user_input)
+            
+            if min_value is not None and value < min_value:
+                print(f" Valor debe ser >= {min_value}")
+                continue
+            
+            if max_value is not None and value > max_value:
+                print(f" Valor debe ser <= {max_value}")
+                continue
+            
+            return value
+            
+        except ValueError:
+            print(" Por favor ingrese un número válido")
+            continue
+        except (KeyboardInterrupt, EOFError):
+            print("\n Operación cancelada")
+            return None
+```
+
+### Uso de la respuesta
+
+Se solucionó el problema mejorando:
+- El método `start_game()` para no resetear el tablero si ya tiene fichas
+- El método `_get_integer_input_()` para manejar mejor la entrada del usuario
+- Validación de entrada vacía y manejo de errores más robusto
+- Verificaciones de estado del juego antes de permitir movimientos
+

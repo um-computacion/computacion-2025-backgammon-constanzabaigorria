@@ -5,6 +5,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - Se crearon los tests completos para el CLI en `tests/test_cli.py`, siguiendo SOLID, TDD, PEP 8, PEP 257 y PEP 484.
+- Se implementó una visualización completa del tablero de Backgammon en formato ASCII
+- Se agregó manejo automático de inicialización del juego en el CLI
+- Se mejoró el manejo de entrada de datos del usuario con validaciones robustas
+- Se solucionó el error "El juego no ha comenzado" agregando inicialización automática
+- Se corrigió el error "No hay fichas en el punto de origen" mejorando el manejo de entrada
+- Se mejoró la visualización del tablero para mostrar correctamente las fichas en la barra
+- Se optimizó el método `start_game()` para no resetear el tablero innecesariamente
+- Se mejoró la interfaz CLI con mensajes informativos más claros
+- Se actualizó la visualización del tablero para mostrar fichas en la barra y fuera del tablero
+- Se mejoró el manejo de errores en los comandos del CLI
 
 ## [Sprint 3] – 2025-10-01
 
