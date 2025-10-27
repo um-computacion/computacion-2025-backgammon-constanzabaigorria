@@ -95,9 +95,9 @@ class TableroBackgammon:
             "Tirar Dados",
         )
 
-        # Estado del juego
+        # Estado del juego: inicialmente no hay juego vinculado, inicializar en vacío
         self.juego: Optional[BackgammonGame] = None
-        self.estado_tablero = None
+        self.estado_tablero = []  # estado por defecto vacío hasta vincular juego
         self.dados = None
         self.seleccionado: Optional[int] = None
         self.destinos: Optional[List[int]] = None

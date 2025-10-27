@@ -6,6 +6,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Se implementó cambio automático de jugadores después de completar movimientos
 - Se agregó seguimiento de movimientos restantes en el CLI
+- Se implementa estructura de pygame con errores.
 
 ## [Sprint 4] – 2025-10-15
 
