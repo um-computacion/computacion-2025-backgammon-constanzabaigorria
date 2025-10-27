@@ -178,12 +178,39 @@ class BackgammonGame:
         return self.__dice_rolled
 
     def get_available_moves(self) -> List[Any]:
-        """Devuelve los movimientos disponibles."""
-        return []
+        """Devuelve los movimientos disponibles basados en los dados lanzados."""
+        if not self.__dice_rolled or not self.__last_dice_roll:
+            return []
+            
+        movimientos = []
+        dado1, dado2 = self.__last_dice_roll
+        
+        # Buscar fichas del jugador actual en el tablero
+        for punto_idx in range(24):
+            if self.__board.points[punto_idx]:
+                primera_ficha = self.__board.points[punto_idx][0]
+                if primera_ficha.get_owner() == self.__current_player:
+                    punto_num = punto_idx + 1
+                    
+                    # Calcular posibles destinos para cada dado
+                    for dado in [dado1, dado2]:
+                        # En Backgammon:
+                        # - Fichas blancas van hacia números más altos (1->24)
+                        # - Fichas negras van hacia números más bajos (24->1)
+                        if self.__current_player.get_color() == "white":
+                            destino = punto_num + dado
+                        else:
+                            destino = punto_num - dado
+                            
+                        if 1 <= destino <= 24:
+                            if self.is_valid_move(punto_num, destino):
+                                movimientos.append((punto_num, destino, dado))
+                                
+        return movimientos
 
     def is_valid_move(self, from_point: int, to_point: int) -> bool:
         """
-        Valida si un movimiento es válido.
+        Valida si un movimiento es válido basado en los dados lanzados.
 
         Args:
             from_point (int): Punto de origen.
@@ -192,6 +219,47 @@ class BackgammonGame:
         Returns:
             bool: True si el movimiento es válido, False en caso contrario.
         """
+        if not self.__started or self.__finished:
+            return False
+        
+        if not self.__dice_rolled:
+            return False
+            
+        # Verificar que el punto de origen tenga fichas del jugador actual
+        if from_point < 1 or from_point > 24:
+            return False
+            
+        punto_origen = from_point - 1
+        if not self.__board.points[punto_origen]:
+            return False
+            
+        # Verificar que la ficha pertenezca al jugador actual
+        primera_ficha = self.__board.points[punto_origen][0]
+        if primera_ficha.get_owner() != self.__current_player:
+            return False
+            
+        # Calcular la distancia del movimiento
+        distancia = abs(to_point - from_point)
+        
+        # Verificar si la distancia coincide con algún valor de dado
+        dado1, dado2 = self.__last_dice_roll
+        if distancia not in [dado1, dado2]:
+            return False
+            
+        # Verificar que el punto de destino sea válido
+        if to_point < 1 or to_point > 24:
+            return False
+            
+        punto_destino = to_point - 1
+        
+        # Verificar si el punto de destino está bloqueado por el oponente
+        if self.__board.points[punto_destino]:
+            primera_ficha_destino = self.__board.points[punto_destino][0]
+            if primera_ficha_destino.get_owner() != self.__current_player:
+                # Si hay más de una ficha del oponente, está bloqueado
+                if len(self.__board.points[punto_destino]) > 1:
+                    return False
+                    
         return True
 
     def make_move(self, from_point: int, to_point: int) -> bool:
@@ -205,20 +273,44 @@ class BackgammonGame:
         Returns:
             bool: True si el movimiento fue realizado, False en caso contrario.
         """
-        if not self.__started:
-            raise ValueError("El juego no ha comenzado")
-        if self.__finished:
-            raise ValueError("El juego ha finalizado")
-        if not self.__dice_rolled:
-            raise ValueError("Debe tirar los dados antes de mover")
-        # Verifica que haya fichas en el punto de origen
-        if not hasattr(self.__board, "points"):
-            raise AttributeError("El tablero no tiene el atributo 'points'")
-        if not self.__board.points[from_point - 1]:
-            raise ValueError("No hay fichas en el punto de origen")
-        # Mueve la ficha
-        checker = self.__board.points[from_point - 1].pop()
-        self.__board.points[to_point - 1].append(checker)
+        if not self.is_valid_move(from_point, to_point):
+            return False
+            
+        punto_origen = from_point - 1
+        punto_destino = to_point - 1
+        
+        # Calcular la distancia del movimiento
+        distancia = abs(to_point - from_point)
+        dado1, dado2 = self.__last_dice_roll
+        
+        # Remover la ficha del punto de origen
+        ficha_movida = self.__board.points[punto_origen].pop()
+        
+        # Si hay una ficha del oponente en el destino, enviarla a la barra
+        if self.__board.points[punto_destino]:
+            primera_ficha_destino = self.__board.points[punto_destino][0]
+            if primera_ficha_destino.get_owner() != self.__current_player:
+                ficha_capturada = self.__board.points[punto_destino].pop()
+                # Agregar a la barra del oponente
+                color_oponente = ficha_capturada.get_owner().get_color()
+                self.__board.bar[color_oponente].append(ficha_capturada)
+        
+        # Colocar la ficha en el destino
+        self.__board.points[punto_destino].append(ficha_movida)
+        
+        # Actualizar el estado de los dados
+        if distancia == dado1:
+            self.__last_dice_roll = (dado2,)
+        elif distancia == dado2:
+            self.__last_dice_roll = (dado1,)
+        else:
+            # Si ambos dados tienen el mismo valor, usar uno
+            self.__last_dice_roll = (dado1,)
+            
+        # Si no quedan dados por usar, cambiar de turno
+        if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
+            self.end_turn()
+            
         self.__moves_count += 1
         return True
 
