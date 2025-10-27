@@ -154,9 +154,15 @@ class TableroBackgammon:
         # Dibujar fichas si hay juego activo
         if self.juego:
             self._dibujar_fichas()
+            self._dibujar_fichas_barra()
             # Dibujar movimientos válidos si hay una ficha seleccionada
             if self.seleccionado is not None:
-                self._dibujar_movimientos_validos()
+                if self.seleccionado == -1:
+                    # Barra seleccionada, dibujar indicación y movimientos válidos
+                    self._dibujar_barra_seleccionada()
+                    self._dibujar_movimientos_validos_desde_barra()
+                else:
+                    self._dibujar_movimientos_validos()
 
         # Etiquetas en zona de bear off
         fuente = pygame.font.Font(None, 24)
@@ -279,6 +285,144 @@ class TableroBackgammon:
                     grosor_borde
                 )
 
+    def _dibujar_fichas_barra(self) -> None:
+        """Dibuja las fichas en la barra."""
+        if not self.juego:
+            return
+            
+        board = self.juego.get_board()
+        
+        # Dibujar fichas blancas en la barra
+        fichas_blancas_barra = board.bar["white"]
+        for idx, ficha in enumerate(fichas_blancas_barra):
+            x = self.x_tablero + self.ancho_tablero // 2 - self.radio_ficha
+            y = self.y_tablero + self.alto_tablero // 2 - 20 - (idx * (self.radio_ficha * 2 + 5))
+            pygame.draw.circle(
+                self.pantalla,
+                self.colores["ficha_blanca"],
+                (x, y),
+                self.radio_ficha
+            )
+            pygame.draw.circle(
+                self.pantalla,
+                self.colores["borde"],
+                (x, y),
+                self.radio_ficha,
+                2
+            )
+        
+        # Dibujar fichas negras en la barra
+        fichas_negras_barra = board.bar["black"]
+        for idx, ficha in enumerate(fichas_negras_barra):
+            x = self.x_tablero + self.ancho_tablero // 2 + self.radio_ficha
+            y = self.y_tablero + self.alto_tablero // 2 - 20 - (idx * (self.radio_ficha * 2 + 5))
+            pygame.draw.circle(
+                self.pantalla,
+                self.colores["ficha_negra"],
+                (x, y),
+                self.radio_ficha
+            )
+            pygame.draw.circle(
+                self.pantalla,
+                self.colores["borde"],
+                (x, y),
+                self.radio_ficha,
+                2
+            )
+
+    def _dibujar_barra_seleccionada(self) -> None:
+        """Dibuja una indicación visual cuando la barra está seleccionada."""
+        barra_x_centro = self.x_tablero + self.ancho_tablero // 2
+        barra_y_centro = self.y_tablero + self.alto_tablero // 2
+        
+        # Dibujar un círculo dorado alrededor de la barra
+        pygame.draw.circle(
+            self.pantalla,
+            (255, 215, 0),  # Color dorado
+            (barra_x_centro, barra_y_centro),
+            60,
+            3
+        )
+
+    def _dibujar_movimientos_validos_desde_barra(self) -> None:
+        """Dibuja los movimientos válidos desde la barra."""
+        if not self.juego:
+            return
+            
+        jugador_actual = self.juego.get_current_player()
+        color_jugador = jugador_actual.get_color()
+        board = self.juego.get_board()
+        
+        # Verificar que el jugador tenga fichas en la barra
+        if not board.bar[color_jugador]:
+            return
+            
+        # Obtener los valores de dados disponibles
+        dados_disponibles = self.juego.get_last_dice_roll()
+        if not dados_disponibles:
+            return
+            
+        # Manejar tanto tuplas de 2 elementos como de 1 elemento
+        if len(dados_disponibles) == 2:
+            dado1, dado2 = dados_disponibles
+            valores_dados = [dado1, dado2]
+        elif len(dados_disponibles) == 1:
+            valores_dados = [dados_disponibles[0]]
+        else:
+            return
+            
+        # Calcular puntos válidos según el color del jugador
+        puntos_validos = []
+        
+        for valor_dado in valores_dados:
+            if color_jugador == "white":
+                # Fichas blancas reingresan en el lado del oponente (puntos 1-6)
+                punto_destino = valor_dado
+            else:
+                # Fichas negras reingresan en el lado del oponente (puntos 19-24)
+                punto_destino = 25 - valor_dado
+                
+            # Verificar que el punto sea válido según las reglas de reingreso
+            if color_jugador == "white":
+                # Fichas blancas solo pueden reingresar en puntos 1-6
+                if not (1 <= punto_destino <= 6):
+                    continue
+            else:
+                # Fichas negras solo pueden reingresar en puntos 19-24
+                if not (19 <= punto_destino <= 24):
+                    continue
+                    
+            punto_idx = punto_destino - 1
+                
+            # Verificar si el punto está bloqueado por el oponente
+            if board.points[punto_idx]:
+                primera_ficha = board.points[punto_idx][0]
+                if primera_ficha.get_owner() != jugador_actual:
+                    # Si hay más de una ficha del oponente, está bloqueado
+                    if len(board.points[punto_idx]) > 1:
+                        continue  # Punto bloqueado
+                
+            puntos_validos.append(punto_idx)
+        
+        # Dibujar círculos verdes en los puntos válidos
+        for punto_idx in puntos_validos:
+            self._dibujar_circulo_movimiento_valido(punto_idx)
+
+    def _dibujar_circulo_movimiento_valido(self, punto_idx: int) -> None:
+        """Dibuja un círculo verde en un punto válido para movimiento."""
+        # Usar la misma lógica que _calcular_x_punto y _calcular_y_base
+        x = self._calcular_x_punto(punto_idx)
+        y_base = self._calcular_y_base(punto_idx)
+        
+        # Dibujar círculo verde
+        pygame.draw.circle(
+            self.pantalla,
+            (0, 255, 0),  # Verde
+            (x + self.ancho_punto // 2, y_base),
+            15,
+            3
+        )
+
     def _dibujar_movimientos_validos(self) -> None:
         """Dibuja los movimientos válidos para la ficha seleccionada."""
         if self.seleccionado is None or not self.juego:
@@ -331,7 +475,7 @@ class TableroBackgammon:
                 (x + self.ancho_punto // 2, y_base),
                 self.radio_ficha + 5,
                 3
-            )
+                )
 
     def _calcular_x_punto(self, punto: int) -> int:
         """Calcula la coordenada x para un punto."""
@@ -467,14 +611,36 @@ class TableroBackgammon:
 
         if evento.type == 1025 and evento.button == 1:  # MOUSEBUTTONDOWN
             x, y = evento.pos
+            
+            # Verificar si se hizo clic en la barra
+            if self._es_clic_en_barra(x, y):
+                # Cuando se hace clic en la barra, necesitamos esperar el segundo clic para el destino
+                if self.seleccionado is None:
+                    # Marcar que estamos seleccionando desde la barra
+                    self.seleccionado = -1  # Usar -1 para indicar selección desde barra
+                else:
+                    # Ya tenemos la barra seleccionada, ahora obtener el destino
+                    punto_clicado = self._obtener_punto_clicado(x, y)
+                    if punto_clicado is not None:
+                        # Intentar mover desde la barra
+                        if self.juego.make_move_from_bar(punto_clicado + 1):
+                            self.actualizar_desde_juego()
+                    self.seleccionado = None
+                return
+            
             punto_clicado = self._obtener_punto_clicado(x, y)
             if punto_clicado is not None:
                 if self.seleccionado is None:
                     # Solo permitir seleccionar fichas del jugador actual
                     if self._puede_seleccionar_punto(punto_clicado):
                         self.seleccionado = punto_clicado
+                elif self.seleccionado == -1:
+                    # Tenemos la barra seleccionada, intentar mover desde la barra
+                    if self.juego.make_move_from_bar(punto_clicado + 1):
+                        self.actualizar_desde_juego()
+                    self.seleccionado = None
                 else:
-                    # Intentar mover la ficha
+                    # Intentar mover la ficha normal
                     if self.juego.is_valid_move(self.seleccionado + 1, punto_clicado + 1):
                         if self.juego.make_move(self.seleccionado + 1, punto_clicado + 1):
                             self.actualizar_desde_juego()
@@ -505,18 +671,49 @@ class TableroBackgammon:
             return 11 - punto if punto < 6 else None
         return None
 
+    def _es_clic_en_barra(self, x: int, y: int) -> bool:
+        """Verifica si el clic fue en la barra central."""
+        if not self.juego:
+            return False
+            
+        # Verificar si el jugador actual tiene fichas en la barra
+        jugador_actual = self.juego.get_current_player()
+        color_jugador = jugador_actual.get_color()
+        board = self.juego.get_board()
+        
+        if not board.bar[color_jugador]:
+            return False
+            
+        # Verificar si el clic está en el área de la barra
+        barra_x_centro = self.x_tablero + self.ancho_tablero // 2
+        barra_y_centro = self.y_tablero + self.alto_tablero // 2
+        
+        # Área de clic en la barra (más amplia para facilitar el clic)
+        area_clic = 50
+        
+        return (abs(x - barra_x_centro) < area_clic and 
+                abs(y - barra_y_centro) < area_clic)
+
     def _puede_seleccionar_punto(self, punto_idx: int) -> bool:
         """Verifica si el punto puede ser seleccionado por el jugador actual."""
         if not self.juego:
             return False
             
+        # Si el jugador tiene fichas en la barra, debe moverlas primero
+        jugador_actual = self.juego.get_current_player()
+        color_jugador = jugador_actual.get_color()
+        board = self.juego.get_board()
+        
+        if board.bar[color_jugador]:
+            return False  # No puede seleccionar fichas normales si tiene fichas en la barra
+            
         # Verificar que el punto tenga fichas
-        if not self.juego.get_board().points[punto_idx]:
+        if not board.points[punto_idx]:
             return False
             
         # Verificar que la primera ficha pertenezca al jugador actual
-        primera_ficha = self.juego.get_board().points[punto_idx][0]
-        return primera_ficha.get_owner() == self.juego.get_current_player()
+        primera_ficha = board.points[punto_idx][0]
+        return primera_ficha.get_owner() == jugador_actual
 
     def ejecutar(self) -> None:
         """Bucle principal del tablero."""
