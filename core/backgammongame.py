@@ -183,7 +183,16 @@ class BackgammonGame:
             return []
             
         movimientos = []
-        dado1, dado2 = self.__last_dice_roll
+        dados_disponibles = self.__last_dice_roll
+        
+        # Manejar tanto tuplas de 2 elementos como de 1 elemento
+        if len(dados_disponibles) == 2:
+            dado1, dado2 = dados_disponibles
+        elif len(dados_disponibles) == 1:
+            dado1 = dados_disponibles[0]
+            dado2 = None
+        else:
+            return []
         
         # Buscar fichas del jugador actual en el tablero
         for punto_idx in range(24):
@@ -193,7 +202,11 @@ class BackgammonGame:
                     punto_num = punto_idx + 1
                     
                     # Calcular posibles destinos para cada dado
-                    for dado in [dado1, dado2]:
+                    dados_a_procesar = [dado1]
+                    if dado2 is not None:
+                        dados_a_procesar.append(dado2)
+                        
+                    for dado in dados_a_procesar:
                         # En Backgammon:
                         # - Fichas blancas van hacia números más altos (1->24)
                         # - Fichas negras van hacia números más bajos (24->1)
@@ -242,8 +255,18 @@ class BackgammonGame:
         distancia = abs(to_point - from_point)
         
         # Verificar si la distancia coincide con algún valor de dado
-        dado1, dado2 = self.__last_dice_roll
-        if distancia not in [dado1, dado2]:
+        dados_disponibles = self.__last_dice_roll
+        
+        # Manejar tanto tuplas de 2 elementos como de 1 elemento
+        if len(dados_disponibles) == 2:
+            dado1, dado2 = dados_disponibles
+            valores_dados = [dado1, dado2]
+        elif len(dados_disponibles) == 1:
+            valores_dados = [dados_disponibles[0]]
+        else:
+            return False
+            
+        if distancia not in valores_dados:
             return False
             
         # Verificar que el punto de destino sea válido
@@ -281,7 +304,16 @@ class BackgammonGame:
         
         # Calcular la distancia del movimiento
         distancia = abs(to_point - from_point)
-        dado1, dado2 = self.__last_dice_roll
+        dados_disponibles = self.__last_dice_roll
+        
+        # Manejar tanto tuplas de 2 elementos como de 1 elemento
+        if len(dados_disponibles) == 2:
+            dado1, dado2 = dados_disponibles
+        elif len(dados_disponibles) == 1:
+            dado1 = dados_disponibles[0]
+            dado2 = None
+        else:
+            return False
         
         # Remover la ficha del punto de origen
         ficha_movida = self.__board.points[punto_origen].pop()
@@ -299,13 +331,17 @@ class BackgammonGame:
         self.__board.points[punto_destino].append(ficha_movida)
         
         # Actualizar el estado de los dados
-        if distancia == dado1:
-            self.__last_dice_roll = (dado2,)
-        elif distancia == dado2:
-            self.__last_dice_roll = (dado1,)
+        if len(dados_disponibles) == 2:
+            if distancia == dado1:
+                self.__last_dice_roll = (dado2,)
+            elif distancia == dado2:
+                self.__last_dice_roll = (dado1,)
+            else:
+                # Si ambos dados tienen el mismo valor, usar uno
+                self.__last_dice_roll = (dado1,)
         else:
-            # Si ambos dados tienen el mismo valor, usar uno
-            self.__last_dice_roll = (dado1,)
+            # Solo queda un dado, se usa y se termina el turno
+            self.__last_dice_roll = ()
             
         # Si no quedan dados por usar, cambiar de turno
         if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
