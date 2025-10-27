@@ -22,10 +22,11 @@ def main() -> None:
     elif choice == "2":
         print("\nIniciando modo Pygame UI...\n")
         try:
-            from pygame_ui.pygame_ui import main as run_pygame_ui
+            from pygame_ui.pygameUI import main as run_pygame_ui
             run_pygame_ui()
-        except ImportError:
-            print("Pygame UI no disponible. Usa CLI (opción 1).")
+        except ImportError as e:
+            print(f"Pygame UI no disponible: {e}")
+            print("Usa CLI (opción 1) o instala pygame: pip install pygame")
     else:
         print("\nOpción inválida. Ejecuta el programa nuevamente y elige 1 o 2.")
 

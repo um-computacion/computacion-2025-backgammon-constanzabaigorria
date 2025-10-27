@@ -1,20 +1,20 @@
-#código de ejemplo para pygame_ui/main.py sacado de la página propuesta por el profe Quinteros
+"""
+Archivo principal para ejecutar la interfaz gráfica de Backgammon.
+"""
 
-import pygame
+from pygameUI import PygameUI
 
-# Initialize Pygame
-pygame.init()
 
-# Set up the game window
-screen = pygame.display.set_mode((400, 300))
-pygame.display.set_caption("Hello Pygame")
+def main():
+    """Función principal para ejecutar la interfaz gráfica."""
+    try:
+        ui = PygameUI()
+        ui.run()
+    except Exception as e:
+        print(f"Error al ejecutar la interfaz gráfica: {e}")
+        import pygame
+        pygame.quit()
 
-# Game loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 
-# Quit Pygame
-pygame.quit()
+if __name__ == "__main__":
+    main()
