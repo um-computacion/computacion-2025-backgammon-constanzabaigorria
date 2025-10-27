@@ -243,9 +243,8 @@ class TableroBackgammon:
         if not self.juego:
             return
 
-        # Obtener las fichas de ambos jugadores
-        fichas_blancas = self.juego.get_player1_checkers()
-        fichas_negras = self.juego.get_player2_checkers()
+        # Obtener las fichas directamente desde el tablero del juego
+        board = self.juego.get_board()
 
         # Para cada punto en el tablero
         for punto in range(24):
@@ -253,14 +252,12 @@ class TableroBackgammon:
             y_base = self._calcular_y_base(punto)
             y_dir = 1 if punto >= 12 else -1
 
-            # Contar fichas en este punto
+            # Obtener fichas en este punto desde el tablero
             fichas_en_punto = []
-            for ficha in fichas_blancas:
-                if ficha.get_position() == punto:
-                    fichas_en_punto.append(("white", self.colores["ficha_blanca"]))
-            for ficha in fichas_negras:
-                if ficha.get_position() == punto:
-                    fichas_en_punto.append(("black", self.colores["ficha_negra"]))
+            if board.points[punto]:  # Si hay fichas en este punto
+                for ficha in board.points[punto]:
+                    color_ficha = self.colores["ficha_blanca"] if ficha.get_color() == "white" else self.colores["ficha_negra"]
+                    fichas_en_punto.append((ficha.get_color(), color_ficha))
 
             # Dibujar las fichas
             for idx, (_, color_ficha) in enumerate(fichas_en_punto):
@@ -290,12 +287,26 @@ class TableroBackgammon:
         # Obtener movimientos válidos desde el punto seleccionado
         movimientos_validos = []
         if self.juego.has_dice_been_rolled():
-            dado1, dado2 = self.juego.get_last_dice_roll()
+            dados_disponibles = self.juego.get_last_dice_roll()
+            
+            # Manejar tanto tuplas de 2 elementos como de 1 elemento
+            if len(dados_disponibles) == 2:
+                dado1, dado2 = dados_disponibles
+            elif len(dados_disponibles) == 1:
+                dado1 = dados_disponibles[0]
+                dado2 = None
+            else:
+                return
+                
             punto_seleccionado = self.seleccionado + 1
             
             # Calcular posibles destinos
             jugador_actual = self.juego.get_current_player()
-            for dado in [dado1, dado2]:
+            dados_a_procesar = [dado1]
+            if dado2 is not None:
+                dados_a_procesar.append(dado2)
+                
+            for dado in dados_a_procesar:
                 # En Backgammon:
                 # - Fichas blancas van hacia números más altos (1->24)
                 # - Fichas negras van hacia números más bajos (24->1)
