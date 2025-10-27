@@ -318,14 +318,22 @@ class BackgammonGame:
         # Remover la ficha del punto de origen
         ficha_movida = self.__board.points[punto_origen].pop()
         
-        # Si hay una ficha del oponente en el destino, enviarla a la barra
+        # Si hay fichas del oponente en el destino, verificar captura
         if self.__board.points[punto_destino]:
             primera_ficha_destino = self.__board.points[punto_destino][0]
             if primera_ficha_destino.get_owner() != self.__current_player:
-                ficha_capturada = self.__board.points[punto_destino].pop()
-                # Agregar a la barra del oponente
-                color_oponente = ficha_capturada.get_owner().get_color()
-                self.__board.bar[color_oponente].append(ficha_capturada)
+                # Solo se puede capturar si hay exactamente 1 ficha del oponente
+                if len(self.__board.points[punto_destino]) == 1:
+                    ficha_capturada = self.__board.points[punto_destino].pop()
+                    # Agregar a la barra del oponente
+                    color_oponente = ficha_capturada.get_owner().get_color()
+                    self.__board.bar[color_oponente].append(ficha_capturada)
+                    # Actualizar posición de la ficha capturada
+                    ficha_capturada.set_position(None)
+                    ficha_capturada.set_on_bar(True)
+                else:
+                    # Hay más de 1 ficha del oponente, no se puede capturar
+                    return False
         
         # Colocar la ficha en el destino
         self.__board.points[punto_destino].append(ficha_movida)
@@ -341,6 +349,106 @@ class BackgammonGame:
                 self.__last_dice_roll = (dado1,)
         else:
             # Solo queda un dado, se usa y se termina el turno
+            self.__last_dice_roll = ()
+            
+        # Si no quedan dados por usar, cambiar de turno
+        if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
+            self.end_turn()
+            
+        self.__moves_count += 1
+        return True
+
+    def make_move_from_bar(self, to_point: int) -> bool:
+        """
+        Realiza un movimiento desde la barra.
+
+        Args:
+            to_point (int): Punto de destino.
+
+        Returns:
+            bool: True si el movimiento fue realizado, False en caso contrario.
+        """
+        if not self.__started or self.__finished:
+            return False
+        
+        if not self.__dice_rolled:
+            return False
+            
+        # Verificar que el jugador tenga fichas en la barra
+        color_jugador = self.__current_player.get_color()
+        if not self.__board.bar[color_jugador]:
+            return False
+            
+        # Verificar que el punto de destino sea válido según las reglas de reingreso
+        if color_jugador == "white":
+            # Fichas blancas solo pueden reingresar en puntos 1-6
+            if not (1 <= to_point <= 6):
+                return False
+        else:
+            # Fichas negras solo pueden reingresar en puntos 19-24
+            if not (19 <= to_point <= 24):
+                return False
+                
+        punto_destino = to_point - 1
+        
+        # Verificar si el punto de destino está bloqueado por el oponente
+        if self.__board.points[punto_destino]:
+            primera_ficha_destino = self.__board.points[punto_destino][0]
+            if primera_ficha_destino.get_owner() != self.__current_player:
+                # Si hay más de una ficha del oponente, está bloqueado
+                if len(self.__board.points[punto_destino]) > 1:
+                    return False
+        
+        # Verificar que la distancia coincida con algún valor de dado
+        dados_disponibles = self.__last_dice_roll
+        
+        # Manejar tanto tuplas de 2 elementos como de 1 elemento
+        if len(dados_disponibles) == 2:
+            dado1, dado2 = dados_disponibles
+            valores_dados = [dado1, dado2]
+        elif len(dados_disponibles) == 1:
+            valores_dados = [dados_disponibles[0]]
+        else:
+            return False
+            
+        # Calcular la distancia desde la barra
+        if self.__current_player.get_color() == "white":
+            # Fichas blancas van hacia números más altos desde la barra
+            distancia = to_point
+        else:
+            # Fichas negras van hacia números más bajos desde la barra
+            distancia = 25 - to_point
+            
+        if distancia not in valores_dados:
+            return False
+        
+        # Remover una ficha de la barra
+        ficha_movida = self.__board.bar[color_jugador].pop()
+        
+        # Si hay una ficha del oponente en el destino, capturarla
+        if self.__board.points[punto_destino]:
+            primera_ficha_destino = self.__board.points[punto_destino][0]
+            if primera_ficha_destino.get_owner() != self.__current_player:
+                ficha_capturada = self.__board.points[punto_destino].pop()
+                color_oponente = ficha_capturada.get_owner().get_color()
+                self.__board.bar[color_oponente].append(ficha_capturada)
+                ficha_capturada.set_position(None)
+                ficha_capturada.set_on_bar(True)
+        
+        # Colocar la ficha en el destino
+        self.__board.points[punto_destino].append(ficha_movida)
+        ficha_movida.set_position(punto_destino)
+        ficha_movida.set_on_bar(False)
+        
+        # Actualizar el estado de los dados
+        if len(dados_disponibles) == 2:
+            if distancia == dado1:
+                self.__last_dice_roll = (dado2,)
+            elif distancia == dado2:
+                self.__last_dice_roll = (dado1,)
+            else:
+                self.__last_dice_roll = (dado1,)
+        else:
             self.__last_dice_roll = ()
             
         # Si no quedan dados por usar, cambiar de turno
@@ -372,7 +480,8 @@ class BackgammonGame:
         Returns:
             bool: True si debe entrar desde la barra, False en caso contrario.
         """
-        return False
+        color_jugador = player.get_color()
+        return len(self.__board.bar[color_jugador]) > 0
 
     def can_bear_off(self, player: Player) -> bool:
         """
