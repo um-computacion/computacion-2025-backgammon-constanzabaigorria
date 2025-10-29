@@ -536,7 +536,6 @@ class TableroBackgammon:
                 (x + lado // 4, y + lado // 2),          # Medio izquierda
                 (x + 3 * lado // 4, y + lado // 2)       # Medio derecha
             ])
-        
         for punto in puntos:
             pygame.draw.circle(self.pantalla, self.colores["texto"], punto, radio)
 
@@ -544,29 +543,23 @@ class TableroBackgammon:
         """Dibuja la información del turno actual."""
         if not self.juego:
             return
-            
         # Posición arriba a la derecha
         x_info = self.ancho - 200
         y_info = 20
-        
         # Obtener información del jugador actual
         jugador_actual = self.juego.get_current_player()
         nombre_jugador = jugador_actual.get_name()
         color_jugador = jugador_actual.get_color()
-        
         # Crear texto del turno
         fuente = pygame.font.Font(None, 28)
         texto_turno = f"Turno: {nombre_jugador}"
         texto_renderizado = fuente.render(texto_turno, True, self.colores["texto"])
-        
         # Dibujar fondo para el texto
         rect_fondo = pygame.Rect(x_info - 10, y_info - 5, texto_renderizado.get_width() + 20, texto_renderizado.get_height() + 10)
         pygame.draw.rect(self.pantalla, self.colores["punto_claro"], rect_fondo, border_radius=5)
         pygame.draw.rect(self.pantalla, self.colores["borde"], rect_fondo, 2, border_radius=5)
-        
         # Dibujar el texto
         self.pantalla.blit(texto_renderizado, (x_info, y_info))
-        
         # Dibujar indicador de color del jugador
         radio_indicator = 8
         color_ficha = self.colores["ficha_blanca"] if color_jugador == "white" else self.colores["ficha_negra"]
