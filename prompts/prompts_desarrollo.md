@@ -2989,3 +2989,114 @@ Se implementó el cambio automático de jugadores:
 - Se mejoró el comando `status` para mostrar movimientos restantes y estado de dados
 - Se corrigió el formato del estado del juego para mostrar jugador y color correctamente
 
+## Prompt [20]
+
+**Fecha**: 15-01-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: implementación de sistema de captura de fichas en Backgammon
+
+## Prompt enviado
+
+quiero poder mover los checkers en base al valor del dado, ademas agrega un texto arriba a la derecha que diga de quien es el turno, no crees nueva logica usa la logica de @backgammongame.py @pygameUI.py
+
+### Respuesta recibida
+
+Se implementó el sistema de movimiento basado en dados y visualización del turno actual:
+- Se modificó `_dibujar_info_turno()` para mostrar el jugador actual
+- Se actualizó `_dibujar_movimientos_validos()` para validar movimientos según dados
+- Se corrigió `is_valid_move()` y `make_move()` para manejar valores de dados
+- Se agregó `get_available_moves()` para calcular movimientos válidos
+- Se implementó lógica de dirección de movimiento (blancas hacia adelante, negras hacia atrás)
+
+### Uso de la respuesta
+
+Se integró completamente el sistema de movimiento con dados en la interfaz Pygame.
+
+## Prompt [21]
+
+**Fecha**: 15-01-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: corrección de errores en sistema de captura
+
+## Prompt enviado
+
+fix, falta el atributo de player al checker, no sabe quien es jugador 1 o jugador 2
+
+### Respuesta recibida
+
+Se corrigió el error cambiando `get_player()` por `get_owner()` en todos los archivos:
+- Se actualizó `pygameUI.py` para usar `ficha.get_owner()`
+- Se corrigió `backgammongame.py` para usar el método correcto
+- Se verificó que la clase `Checker` tenga el método `get_owner()`
+
+### Uso de la respuesta
+
+Se corrigió el error de atributo faltante en la clase Checker.
+
+## Prompt [22]
+
+**Fecha**: 15-01-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: implementación de reglas de captura de Backgammon
+
+## Prompt enviado
+
+Exelenteee, ahora quiero que hagas que las fichas se puedan capturar como las reglas de backgammon, cuando una ficha cae en el lugar de una ficha de otro color que este sola, recorda que mas de 2 fichas juntas del mismo color hace que no se puedan capturar, cuando se capturen van al medio y cuando es el turno del jugador al que le comieron la ficha tiene que sacarla si o si y tiene que ir al lado de las blancas si la ficha es negra o si la ficha es negra a la zona de las blacnas, no te olvides de las reglas del backgammon @pygameUI.py @backgammongame.py
+
+### Respuesta recibida
+
+Se implementó el sistema completo de captura de fichas:
+- Se modificó `make_move()` para capturar fichas solas del oponente
+- Se agregó `make_move_from_bar()` para movimiento desde la barra
+- Se implementó `must_enter_from_bar()` para validar reingreso obligatorio
+- Se agregó `_dibujar_fichas_barra()` para visualizar fichas capturadas
+- Se implementó `_es_clic_en_barra()` para detectar clics en la barra
+- Se agregó `_dibujar_movimientos_validos_desde_barra()` para mostrar movimientos válidos
+- Se corrigió la lógica de reingreso según reglas del Backgammon
+
+### Uso de la respuesta
+
+Se implementó completamente el sistema de captura siguiendo las reglas oficiales del Backgammon.
+
+## Prompt [23]
+
+**Fecha**: 15-01-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: corrección de posicionamiento de círculos verdes
+
+## Prompt enviado
+
+sale en el lado opuesto no donde deberia fix
+
+### Respuesta recibida
+
+Se corrigió el posicionamiento de los círculos verdes:
+- Se actualizó `_dibujar_circulo_movimiento_valido()` para usar `_calcular_x_punto()` y `_calcular_y_base()`
+- Se corrigió la lógica de reingreso para fichas blancas (puntos 1-6) y negras (puntos 19-24)
+- Se validó que los movimientos desde la barra respeten las reglas del Backgammon
+
+### Uso de la respuesta
+
+Se corrigió el posicionamiento visual de los movimientos válidos desde la barra.
+
+## Prompt [24]
+
+**Fecha**: 15-01-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: corrección de errores de sintaxis
+
+## Prompt enviado
+
+fix te error
+
+### Respuesta recibida
+
+Se corrigieron errores de indentación en `pygameUI.py`:
+- Se arregló la indentación en el método `_dibujar_dados()`
+- Se corrigió la indentación en el método `manejar_eventos()`
+- Se verificó que el código sea sintácticamente correcto
+
+### Uso de la respuesta
+
+Se corrigieron todos los errores de sintaxis en la interfaz Pygame.
+
