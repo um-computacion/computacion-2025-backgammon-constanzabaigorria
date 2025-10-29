@@ -6,7 +6,20 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Se implementó cambio automático de jugadores después de completar movimientos
 - Se agregó seguimiento de movimientos restantes en el CLI
-- Se implementa estructura de pygame con errores.
+- Se implementa estructura de pygame con errores
+- Se implementó sistema completo de captura de fichas en Backgammon
+- Se agregó visualización de fichas en la barra central
+- Se implementó reingreso obligatorio desde la barra
+- Se agregó validación de movimientos válidos desde la barra
+- Se implementó indicación visual de fichas seleccionadas (círculo dorado)
+- Se agregó visualización de movimientos válidos con círculos verdes
+- Se corrigió posicionamiento de fichas cerca de la barra central
+- Se implementó lógica de captura según reglas del Backgammon
+- Se agregó sistema de selección en dos pasos para fichas en la barra
+- Se corrigieron errores de indentación en pygameUI.py
+- Se solucionó problema de posicionamiento de círculos verdes en movimientos válidos
+- Se corrigió lógica de reingreso desde la barra para fichas blancas y negras
+- Se arregló validación de movimientos desde la barra según reglas del Backgammon
 
 ## [Sprint 4] – 2025-10-15
 

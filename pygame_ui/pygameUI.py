@@ -121,7 +121,6 @@ class TableroBackgammon:
     def dibujar_tablero(self) -> None:
         """Dibuja el tablero completo."""
         self.pantalla.fill(self.colores["fondo"])
-        
         # Dibuja el marco del tablero
         pygame.draw.rect(
             self.pantalla,
@@ -289,9 +288,7 @@ class TableroBackgammon:
         """Dibuja las fichas en la barra."""
         if not self.juego:
             return
-            
         board = self.juego.get_board()
-        
         # Dibujar fichas blancas en la barra
         fichas_blancas_barra = board.bar["white"]
         for idx, ficha in enumerate(fichas_blancas_barra):
@@ -310,7 +307,6 @@ class TableroBackgammon:
                 self.radio_ficha,
                 2
             )
-        
         # Dibujar fichas negras en la barra
         fichas_negras_barra = board.bar["black"]
         for idx, ficha in enumerate(fichas_negras_barra):
@@ -334,7 +330,6 @@ class TableroBackgammon:
         """Dibuja una indicación visual cuando la barra está seleccionada."""
         barra_x_centro = self.x_tablero + self.ancho_tablero // 2
         barra_y_centro = self.y_tablero + self.alto_tablero // 2
-        
         # Dibujar un círculo dorado alrededor de la barra
         pygame.draw.circle(
             self.pantalla,
@@ -348,20 +343,16 @@ class TableroBackgammon:
         """Dibuja los movimientos válidos desde la barra."""
         if not self.juego:
             return
-            
         jugador_actual = self.juego.get_current_player()
         color_jugador = jugador_actual.get_color()
         board = self.juego.get_board()
-        
         # Verificar que el jugador tenga fichas en la barra
         if not board.bar[color_jugador]:
             return
-            
         # Obtener los valores de dados disponibles
         dados_disponibles = self.juego.get_last_dice_roll()
         if not dados_disponibles:
             return
-            
         # Manejar tanto tuplas de 2 elementos como de 1 elemento
         if len(dados_disponibles) == 2:
             dado1, dado2 = dados_disponibles
@@ -370,10 +361,8 @@ class TableroBackgammon:
             valores_dados = [dados_disponibles[0]]
         else:
             return
-            
         # Calcular puntos válidos según el color del jugador
         puntos_validos = []
-        
         for valor_dado in valores_dados:
             if color_jugador == "white":
                 # Fichas blancas reingresan en el lado del oponente (puntos 1-6)
@@ -381,19 +370,16 @@ class TableroBackgammon:
             else:
                 # Fichas negras reingresan en el lado del oponente (puntos 19-24)
                 punto_destino = 25 - valor_dado
-                
             # Verificar que el punto sea válido según las reglas de reingreso
             if color_jugador == "white":
                 # Fichas blancas solo pueden reingresar en puntos 1-6
-                if not (1 <= punto_destino <= 6):
+                if punto_destino < 1 or punto_destino > 6:
                     continue
             else:
                 # Fichas negras solo pueden reingresar en puntos 19-24
-                if not (19 <= punto_destino <= 24):
-                    continue
-                    
+                if punto_destino < 19 or punto_destino > 24:
+                    continue 
             punto_idx = punto_destino - 1
-                
             # Verificar si el punto está bloqueado por el oponente
             if board.points[punto_idx]:
                 primera_ficha = board.points[punto_idx][0]
@@ -401,9 +387,7 @@ class TableroBackgammon:
                     # Si hay más de una ficha del oponente, está bloqueado
                     if len(board.points[punto_idx]) > 1:
                         continue  # Punto bloqueado
-                
             puntos_validos.append(punto_idx)
-        
         # Dibujar círculos verdes en los puntos válidos
         for punto_idx in puntos_validos:
             self._dibujar_circulo_movimiento_valido(punto_idx)
@@ -552,7 +536,6 @@ class TableroBackgammon:
                 (x + lado // 4, y + lado // 2),          # Medio izquierda
                 (x + 3 * lado // 4, y + lado // 2)       # Medio derecha
             ])
-        
         for punto in puntos:
             pygame.draw.circle(self.pantalla, self.colores["texto"], punto, radio)
 
@@ -560,29 +543,23 @@ class TableroBackgammon:
         """Dibuja la información del turno actual."""
         if not self.juego:
             return
-            
         # Posición arriba a la derecha
         x_info = self.ancho - 200
         y_info = 20
-        
         # Obtener información del jugador actual
         jugador_actual = self.juego.get_current_player()
         nombre_jugador = jugador_actual.get_name()
         color_jugador = jugador_actual.get_color()
-        
         # Crear texto del turno
         fuente = pygame.font.Font(None, 28)
         texto_turno = f"Turno: {nombre_jugador}"
         texto_renderizado = fuente.render(texto_turno, True, self.colores["texto"])
-        
         # Dibujar fondo para el texto
         rect_fondo = pygame.Rect(x_info - 10, y_info - 5, texto_renderizado.get_width() + 20, texto_renderizado.get_height() + 10)
         pygame.draw.rect(self.pantalla, self.colores["punto_claro"], rect_fondo, border_radius=5)
         pygame.draw.rect(self.pantalla, self.colores["borde"], rect_fondo, 2, border_radius=5)
-        
         # Dibujar el texto
         self.pantalla.blit(texto_renderizado, (x_info, y_info))
-        
         # Dibujar indicador de color del jugador
         radio_indicator = 8
         color_ficha = self.colores["ficha_blanca"] if color_jugador == "white" else self.colores["ficha_negra"]
