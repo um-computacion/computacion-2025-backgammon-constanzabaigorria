@@ -287,26 +287,20 @@ class BackgammonGame:
 
     def make_move(self, from_point: int, to_point: int) -> bool:
         """
-        Realiza un movimiento en el tablero.
+        Realiza un movimiento en el tablero, incluyendo bear off.
 
         Args:
             from_point (int): Punto de origen.
-            to_point (int): Punto de destino.
-
+            to_point (int): Punto de destino (1-24 o fuera del tablero).
         Returns:
             bool: True si el movimiento fue realizado, False en caso contrario.
         """
         if not self.is_valid_move(from_point, to_point):
             return False
-            
         punto_origen = from_point - 1
         punto_destino = to_point - 1
-        
-        # Calcular la distancia del movimiento
         distancia = abs(to_point - from_point)
         dados_disponibles = self.__last_dice_roll
-        
-        # Manejar tanto tuplas de 2 elementos como de 1 elemento
         if len(dados_disponibles) == 2:
             dado1, dado2 = dados_disponibles
         elif len(dados_disponibles) == 1:
@@ -314,7 +308,57 @@ class BackgammonGame:
             dado2 = None
         else:
             return False
-        
+
+        jugador = self.__current_player
+        board = self.__board
+        color = jugador.get_color()
+        home_points = range(19, 24) if color == "white" else range(0, 6)
+        # BEAR OFF
+        if (color == "white" and from_point >= 19 and to_point == 25) or (color == "black" and from_point <= 6 and to_point == 0):
+            # Validar si realmente puede bear off (todas en home y movimiento legal)
+            if not board.can_bear_off(jugador):
+                return False
+            # Verificar dado válido:
+            movimiento = (to_point - from_point) if color == "white" else (from_point - to_point)
+            if movimiento <= 0:
+                movimiento = 1  # Sacar solo si justo en el extremo
+            # Valores de dado posibles que permiten bear off
+            dados_a_procesar = [dado1]
+            if dado2 is not None:
+                dados_a_procesar.append(dado2)
+            chequeo = False
+            for idx, dado in enumerate(dados_a_procesar):
+                if dado == abs(movimiento):
+                    chequeo = True
+                    # Pop dado usado
+                    if len(dados_disponibles) == 2:
+                        self.__last_dice_roll = (dado2,) if idx == 0 else (dado1,)
+                    else:
+                        self.__last_dice_roll = ()
+                    break
+            if not chequeo:
+                # Permitir sacar con dado mayor solo si no hay ficha detrás
+                max_pos = max([i for i in home_points if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
+                min_pos = min([i for i in home_points if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
+                if color == "white" and max_pos is not None and punto_origen == max_pos:
+                    usable = any(dado >= (25 - from_point) for dado in dados_a_procesar)
+                elif color == "black" and min_pos is not None and punto_origen == min_pos:
+                    usable = any(dado >= (from_point) for dado in dados_a_procesar)
+                else:
+                    usable = False
+                if usable:
+                    self.__last_dice_roll = () if len(dados_disponibles) == 1 else (dado2,) if dado1 >= dado2 else (dado1,)
+                else:
+                    return False
+            # Efectuar bear off
+            ficha_movida = board.points[punto_origen].pop()
+            ficha_movida.move_off_board()
+            board.bear_off[color].append(ficha_movida)
+            # Fin de dados/turno
+            if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
+                self.end_turn()
+            self.__moves_count += 1
+            return True
         # Remover la ficha del punto de origen
         ficha_movida = self.__board.points[punto_origen].pop()
         
