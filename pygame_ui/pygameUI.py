@@ -149,6 +149,23 @@ class TableroBackgammon:
             (self.x_bear, self.y_bear, self.ancho_bear, self.alto_tablero),
             3,
         )
+        # Dibujar fichas bear off
+        if self.juego:
+            board = self.juego.get_board()
+            # BLANCAS (arriba)
+            blancas_off = board.bear_off["white"]
+            for idx, ficha in enumerate(blancas_off):
+                y = self.y_bear + 50 + idx * (self.radio_ficha * 2 + 4)
+                x = self.x_bear + self.ancho_bear // 2
+                pygame.draw.circle(self.pantalla, self.colores["ficha_blanca"], (x, y), self.radio_ficha)
+                pygame.draw.circle(self.pantalla, self.colores["borde"], (x, y), self.radio_ficha, 2)
+            # NEGRAS (abajo)
+            negras_off = board.bear_off["black"]
+            for idx, ficha in enumerate(negras_off):
+                y = self.y_bear + self.alto_tablero - 50 - idx * (self.radio_ficha * 2 + 4)
+                x = self.x_bear + self.ancho_bear // 2
+                pygame.draw.circle(self.pantalla, self.colores["ficha_negra"], (x, y), self.radio_ficha)
+                pygame.draw.circle(self.pantalla, self.colores["borde"], (x, y), self.radio_ficha, 2)
 
         # Dibujar fichas si hay juego activo
         if self.juego:
@@ -167,6 +184,13 @@ class TableroBackgammon:
         fuente = pygame.font.Font(None, 24)
         texto1 = fuente.render("BLANCAS", True, self.colores["texto"])
         texto2 = fuente.render("NEGRAS", True, self.colores["texto"])
+        # Mostrar la cantidad de fichas retiradas (bear off)
+        if self.juego:
+            board = self.juego.get_board()
+            num_blancas = len(board.bear_off["white"])
+            num_negras = len(board.bear_off["black"])
+            texto1 = fuente.render(f"BLANCAS: {num_blancas}", True, self.colores["texto"])
+            texto2 = fuente.render(f"NEGRAS: {num_negras}", True, self.colores["texto"])
         self.pantalla.blit(
             texto1,
             (self.x_bear + 5, self.y_bear + self.alto_tablero // 4 - 12),
@@ -462,11 +486,24 @@ class TableroBackgammon:
                 )
 
     def _calcular_x_punto(self, punto: int) -> int:
-        """Calcula la coordenada x para un punto."""
-        if punto < 12:
-            return self.x_tablero + ((11 - punto) * self.ancho_punto)
-        else:
-            return self.x_tablero + self.ancho_tablero - self.ancho_bear - ((23 - punto) * self.ancho_punto)
+        """Calcula la coordenada x para un punto (0-23) mapeando a 6 columnas por lado."""
+        inicio_derecha = self.x_tablero + self.ancho_mitad + self.ancho_centro
+        # Lado izquierdo (6 columnas)
+        if 6 <= punto <= 11:  # inferior izquierda: 11..6
+            col = 11 - punto
+            return self.x_tablero + col * self.ancho_punto
+        if 12 <= punto <= 17:  # superior izquierda: 12..17
+            col = punto - 12
+            return self.x_tablero + col * self.ancho_punto
+        # Lado derecho (6 columnas)
+        if 0 <= punto <= 5:  # inferior derecha: 5..0
+            col = 5 - punto
+            return inicio_derecha + col * self.ancho_punto
+        if 18 <= punto <= 23:  # superior derecha: 18..23
+            col = punto - 18
+            return inicio_derecha + col * self.ancho_punto
+        # Fallback (no debería ocurrir)
+        return self.x_tablero
 
     def _calcular_y_base(self, punto: int) -> int:
         """Calcula la coordenada y base para un punto."""
