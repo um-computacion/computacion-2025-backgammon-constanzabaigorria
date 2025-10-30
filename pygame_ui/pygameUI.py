@@ -615,6 +615,38 @@ class TableroBackgammon:
         if self.juego.has_dice_been_rolled():
             self.dados = self.juego.get_last_dice_roll()
 
+    def _tiene_reingreso_disponible(self) -> bool:
+        """Devuelve True si el jugador actual puede reingresar desde la barra con los dados actuales."""
+        if not self.juego:
+            return False
+        jugador_actual = self.juego.get_current_player()
+        color_jugador = jugador_actual.get_color()
+        board = self.juego.get_board()
+        # Debe tener fichas en barra
+        if not board.bar[color_jugador]:
+            return False
+        dados_disponibles = self.juego.get_last_dice_roll()
+        if not dados_disponibles:
+            return False
+        valores_dados = list(dados_disponibles)
+        puntos_validos = []
+        for valor_dado in valores_dados:
+            if color_jugador == "white":
+                punto_destino = valor_dado
+                if punto_destino < 1 or punto_destino > 6:
+                    continue
+            else:
+                punto_destino = 25 - valor_dado
+                if punto_destino < 19 or punto_destino > 24:
+                    continue
+            idx = punto_destino - 1
+            if board.points[idx]:
+                primera = board.points[idx][0]
+                if primera.get_owner() != jugador_actual and len(board.points[idx]) > 1:
+                    continue
+            puntos_validos.append(idx)
+        return len(puntos_validos) > 0
+
     def manejar_eventos(self, evento: pygame.event.Event) -> None:
         """Controla los clics en el tablero y el botón."""
         if self.boton_dados.manejar_evento(evento):
@@ -625,39 +657,45 @@ class TableroBackgammon:
 
         if evento.type == 1025 and evento.button == 1:  # MOUSEBUTTONDOWN
             x, y = evento.pos
-            
-            # Verificar si se hizo clic en la barra
             if self._es_clic_en_barra(x, y):
-                # Cuando se hace clic en la barra, necesitamos esperar el segundo clic para el destino
                 if self.seleccionado is None:
-                    # Marcar que estamos seleccionando desde la barra
-                    self.seleccionado = -1  # Usar -1 para indicar selección desde barra
+                    # Si no hay reingresos posibles, perder turno
+                    if not self._tiene_reingreso_disponible():
+                        self.juego.end_turn()
+                        self.actualizar_desde_juego()
+                        return
+                    self.seleccionado = -1
                 else:
-                    # Ya tenemos la barra seleccionada, ahora obtener el destino
                     punto_clicado = self._obtener_punto_clicado(x, y)
                     if punto_clicado is not None:
-                        # Intentar mover desde la barra
                         if self.juego.make_move_from_bar(punto_clicado + 1):
                             self.actualizar_desde_juego()
+                        else:
+                            # Solo perder turno si no hay ningún reingreso posible
+                            if not self._tiene_reingreso_disponible():
+                                self.juego.end_turn()
+                                self.actualizar_desde_juego()
                     self.seleccionado = None
                 return
-            
+
             punto_clicado = self._obtener_punto_clicado(x, y)
             if punto_clicado is not None:
                 if self.seleccionado is None:
-                    # Solo permitir seleccionar fichas del jugador actual
                     if self._puede_seleccionar_punto(punto_clicado):
                         self.seleccionado = punto_clicado
                 elif self.seleccionado == -1:
-                    # Tenemos la barra seleccionada, intentar mover desde la barra
                     if self.juego.make_move_from_bar(punto_clicado + 1):
                         self.actualizar_desde_juego()
+                    else:
+                        if not self._tiene_reingreso_disponible():
+                            self.juego.end_turn()
+                            self.actualizar_desde_juego()
                     self.seleccionado = None
                 else:
-                    # Intentar mover la ficha normal
                     if self.juego.is_valid_move(self.seleccionado + 1, punto_clicado + 1):
                         if self.juego.make_move(self.seleccionado + 1, punto_clicado + 1):
                             self.actualizar_desde_juego()
+                    # Nota: no saltamos turno en invalidaciones normales
                     self.seleccionado = None
 
     def _obtener_punto_clicado(self, x: int, y: int) -> Optional[int]:
