@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- Se implementó bear off (retirar fichas) en la lógica del juego
+- Se agregó visualización de fichas retiradas y conteo en la zona lateral
+- Se ajustó el mapeo de puntos a columnas en la UI para alinear fichas correctamente
+- Se actualizó la UI para saltar el turno solo si el jugador tiene fichas en barra y no existen reingresos válidos con los dados
+- Se resolvió TabError por mezcla de tabs/espacios en `pygame_ui/pygameUI.py`
+
+## [Sprint 5] – 2025-10-30
+
+### Added
 - Se implementó cambio automático de jugadores después de completar movimientos
 - Se agregó seguimiento de movimientos restantes en el CLI
 - Se implementa estructura de pygame con errores
