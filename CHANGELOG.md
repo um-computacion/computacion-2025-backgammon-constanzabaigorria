@@ -9,6 +9,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Se ajustó el mapeo de puntos a columnas en la UI para alinear fichas correctamente
 - Se actualizó la UI para saltar el turno solo si el jugador tiene fichas en barra y no existen reingresos válidos con los dados
 - Se resolvió TabError por mezcla de tabs/espacios en `pygame_ui/pygameUI.py`
+- Se corrigió la lógica de dobles: cuando sale un doble (ej: 2,2), ahora se guarda como (2,2,2,2) permitiendo 4 movimientos del mismo valor según las reglas del Backgammon
+- Se actualizó la visualización de dados en la UI para mostrar correctamente los 4 movimientos disponibles en dobles
+- Se corrigió el consumo de movimientos en dobles para que cada movimiento reste un valor de la tupla hasta agotar los 4 movimientos
 
 ## [Sprint 5] – 2025-10-30
 

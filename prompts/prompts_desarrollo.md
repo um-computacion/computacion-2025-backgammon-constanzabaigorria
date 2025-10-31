@@ -2711,3 +2711,32 @@ Se corrigió `TabError: inconsistent use of tabs and spaces` normalizando la ind
 
 La UI inicia correctamente desde `main.py` opción 2 sin errores de indentación.
 
+## Prompt [41]
+
+**Fecha**: 31-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: corrección de lógica de dobles en Backgammon
+
+## Prompt enviado
+
+sigue sin funcionar, cuando sale un dado doble tiene que multiplicarese osea si salen 2 dados iguales con 2 va a ser 2,2,2,2 como en el backgammon
+
+### Respuesta recibida
+
+Se corrigió completamente la lógica de dobles:
+- **En `backgammongame.py`**:
+  - `roll_dice()`: Cuando se detecta un doble (ej: 2,2), ahora guarda `(2,2,2,2)` en `__last_dice_roll` en lugar de `(2,2)`, permitiendo 4 movimientos del mismo valor
+  - `is_valid_move()`: Actualizado para manejar tuplas de cualquier longitud (dobles tienen 4 elementos, normales tienen 2)
+  - `make_move()`: Actualizado para consumir correctamente los movimientos de dobles, removiendo un elemento de la tupla por cada movimiento usado: (2,2,2,2) → (2,2,2) → (2,2) → (2) → ()
+  - `make_move_from_bar()`: Corregido para manejar correctamente los 4 movimientos de dobles al reingresar desde la barra
+  - Lógica de bear off actualizada para manejar dobles correctamente
+- **En `pygameUI.py`**:
+  - `_dibujar_dados()`: Actualizado para mostrar todos los valores disponibles (hasta 4 dados cuando es doble)
+  - `_dibujar_movimientos_validos()`: Actualizado para calcular y mostrar los 4 destinos posibles cuando hay un doble
+  - `_dibujar_movimientos_validos_desde_barra()`: Corregido para considerar los 4 movimientos de dobles al mostrar reingresos válidos
+  - `_tiene_reingreso_disponible()`: Actualizado para validar correctamente los 4 movimientos en caso de dobles
+
+### Uso de la respuesta
+
+La lógica de dobles ahora funciona correctamente según las reglas oficiales del Backgammon: un doble (2,2) otorga 4 movimientos de valor 2, que se van consumiendo secuencialmente hasta agotarse. La UI muestra correctamente todos los movimientos disponibles y permite utilizar cada uno de los 4 movimientos del doble.
+

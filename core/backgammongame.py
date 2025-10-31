@@ -165,7 +165,11 @@ class BackgammonGame:
         if self.__finished:
             raise ValueError("El juego ha finalizado")
         roll = self.__dice.roll()
-        self.__last_dice_roll = tuple(roll[:2])
+        # Si es un doble, guardar 4 movimientos del mismo valor
+        if roll[0] == roll[1]:
+            self.__last_dice_roll = tuple([roll[0]] * 4)
+        else:
+            self.__last_dice_roll = tuple(roll[:2])
         self.__dice_rolled = True
         return self.__last_dice_roll
 
@@ -185,12 +189,12 @@ class BackgammonGame:
         movimientos = []
         dados_disponibles = self.__last_dice_roll
         
-        # Manejar tanto tuplas de 2 elementos como de 1 elemento
-        if len(dados_disponibles) == 2:
-            dado1, dado2 = dados_disponibles
+        # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
+        if len(dados_disponibles) >= 2:
+            # Dobles: (2,2,2,2) o normales: (2,5)
+            dados_a_procesar = list(dados_disponibles)
         elif len(dados_disponibles) == 1:
-            dado1 = dados_disponibles[0]
-            dado2 = None
+            dados_a_procesar = [dados_disponibles[0]]
         else:
             return []
         
@@ -202,9 +206,6 @@ class BackgammonGame:
                     punto_num = punto_idx + 1
                     
                     # Calcular posibles destinos para cada dado
-                    dados_a_procesar = [dado1]
-                    if dado2 is not None:
-                        dados_a_procesar.append(dado2)
                         
                     for dado in dados_a_procesar:
                         # En Backgammon:
@@ -257,12 +258,10 @@ class BackgammonGame:
         # Verificar si la distancia coincide con algún valor de dado
         dados_disponibles = self.__last_dice_roll
         
-        # Manejar tanto tuplas de 2 elementos como de 1 elemento
-        if len(dados_disponibles) == 2:
-            dado1, dado2 = dados_disponibles
-            valores_dados = [dado1, dado2]
-        elif len(dados_disponibles) == 1:
-            valores_dados = [dados_disponibles[0]]
+        # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
+        if len(dados_disponibles) >= 1:
+            # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
+            valores_dados = list(dados_disponibles)
         else:
             return False
             
@@ -301,14 +300,7 @@ class BackgammonGame:
         punto_destino = to_point - 1
         distancia = abs(to_point - from_point)
         dados_disponibles = self.__last_dice_roll
-        if len(dados_disponibles) == 2:
-            dado1, dado2 = dados_disponibles
-        elif len(dados_disponibles) == 1:
-            dado1 = dados_disponibles[0]
-            dado2 = None
-        else:
-            return False
-
+        
         jugador = self.__current_player
         board = self.__board
         color = jugador.get_color()
@@ -323,20 +315,20 @@ class BackgammonGame:
             if movimiento <= 0:
                 movimiento = 1  # Sacar solo si justo en el extremo
             # Valores de dado posibles que permiten bear off
-            dados_a_procesar = [dado1]
-            if dado2 is not None:
-                dados_a_procesar.append(dado2)
+            # dados_disponibles ya puede ser (2,2,2,2) si es doble o (2,5) si es normal
+            dados_a_procesar = list(dados_disponibles)
             chequeo = False
-            for idx, dado in enumerate(dados_a_procesar):
-                if dado == abs(movimiento):
-                    chequeo = True
-                    # Pop dado usado
-                    if len(dados_disponibles) == 2:
-                        self.__last_dice_roll = (dado2,) if idx == 0 else (dado1,)
-                    else:
-                        self.__last_dice_roll = ()
-                    break
-            if not chequeo:
+            movimiento_abs = abs(movimiento)
+            # Buscar si el movimiento exacto está disponible
+            if movimiento_abs in dados_a_procesar:
+                chequeo = True
+                dados_a_procesar.remove(movimiento_abs)
+                # Actualizar dados restantes
+                if dados_a_procesar:
+                    self.__last_dice_roll = tuple(dados_a_procesar)
+                else:
+                    self.__last_dice_roll = ()
+            else:
                 # Permitir sacar con dado mayor solo si no hay ficha detrás
                 max_pos = max([i for i in home_points if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
                 min_pos = min([i for i in home_points if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
@@ -347,7 +339,21 @@ class BackgammonGame:
                 else:
                     usable = False
                 if usable:
-                    self.__last_dice_roll = () if len(dados_disponibles) == 1 else (dado2,) if dado1 >= dado2 else (dado1,)
+                    # Usar el primer dado mayor disponible
+                    dado_usado = None
+                    for dado in sorted(dados_a_procesar, reverse=True):
+                        if (color == "white" and dado >= (25 - from_point)) or (color == "black" and dado >= from_point):
+                            dado_usado = dado
+                            break
+                    if dado_usado:
+                        dados_a_procesar.remove(dado_usado)
+                        if dados_a_procesar:
+                            self.__last_dice_roll = tuple(dados_a_procesar)
+                        else:
+                            self.__last_dice_roll = ()
+                        chequeo = True
+                    else:
+                        return False
                 else:
                     return False
             # Efectuar bear off
@@ -383,16 +389,25 @@ class BackgammonGame:
         self.__board.points[punto_destino].append(ficha_movida)
         
         # Actualizar el estado de los dados
-        if len(dados_disponibles) == 2:
-            if distancia == dado1:
-                self.__last_dice_roll = (dado2,)
-            elif distancia == dado2:
-                self.__last_dice_roll = (dado1,)
+        if len(dados_disponibles) >= 2:
+            # Puede ser doble (4 elementos) o normal (2 elementos)
+            valores_restantes = list(dados_disponibles)
+            # Remover un movimiento usado
+            if distancia in valores_restantes:
+                valores_restantes.remove(distancia)
             else:
-                # Si ambos dados tienen el mismo valor, usar uno
-                self.__last_dice_roll = (dado1,)
-        else:
+                # Movimiento no coincide con ningún dado disponible
+                return False
+            # Si quedan valores, mantenerlos; si no, terminar turno
+            if valores_restantes:
+                self.__last_dice_roll = tuple(valores_restantes)
+            else:
+                self.__last_dice_roll = ()
+        elif len(dados_disponibles) == 1:
             # Solo queda un dado, se usa y se termina el turno
+            self.__last_dice_roll = ()
+        else:
+            # No hay dados disponibles
             self.__last_dice_roll = ()
             
         # Si no quedan dados por usar, cambiar de turno
@@ -446,12 +461,10 @@ class BackgammonGame:
         # Verificar que la distancia coincida con algún valor de dado
         dados_disponibles = self.__last_dice_roll
         
-        # Manejar tanto tuplas de 2 elementos como de 1 elemento
-        if len(dados_disponibles) == 2:
-            dado1, dado2 = dados_disponibles
-            valores_dados = [dado1, dado2]
-        elif len(dados_disponibles) == 1:
-            valores_dados = [dados_disponibles[0]]
+        # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
+        if len(dados_disponibles) >= 1:
+            # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
+            valores_dados = list(dados_disponibles)
         else:
             return False
             
@@ -485,14 +498,25 @@ class BackgammonGame:
         ficha_movida.set_on_bar(False)
         
         # Actualizar el estado de los dados
-        if len(dados_disponibles) == 2:
-            if distancia == dado1:
-                self.__last_dice_roll = (dado2,)
-            elif distancia == dado2:
-                self.__last_dice_roll = (dado1,)
+        if len(dados_disponibles) >= 2:
+            # Puede ser doble (4 elementos) o normal (2 elementos)
+            valores_restantes = list(dados_disponibles)
+            # Remover un movimiento usado
+            if distancia in valores_restantes:
+                valores_restantes.remove(distancia)
             else:
-                self.__last_dice_roll = (dado1,)
+                # Movimiento no coincide con ningún dado disponible
+                return False
+            # Si quedan valores, mantenerlos; si no, terminar turno
+            if valores_restantes:
+                self.__last_dice_roll = tuple(valores_restantes)
+            else:
+                self.__last_dice_roll = ()
+        elif len(dados_disponibles) == 1:
+            # Solo queda un dado, se usa y se termina el turno
+            self.__last_dice_roll = ()
         else:
+            # No hay dados disponibles
             self.__last_dice_roll = ()
             
         # Si no quedan dados por usar, cambiar de turno
