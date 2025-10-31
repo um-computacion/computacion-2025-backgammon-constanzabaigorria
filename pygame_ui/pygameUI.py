@@ -377,12 +377,10 @@ class TableroBackgammon:
         dados_disponibles = self.juego.get_last_dice_roll()
         if not dados_disponibles:
             return
-        # Manejar tanto tuplas de 2 elementos como de 1 elemento
-        if len(dados_disponibles) == 2:
-            dado1, dado2 = dados_disponibles
-            valores_dados = [dado1, dado2]
-        elif len(dados_disponibles) == 1:
-            valores_dados = [dados_disponibles[0]]
+        # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
+        if len(dados_disponibles) >= 1:
+            # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
+            valores_dados = list(dados_disponibles)
         else:
             return
         # Calcular puntos válidos según el color del jugador
@@ -441,12 +439,10 @@ class TableroBackgammon:
         if self.juego.has_dice_been_rolled():
             dados_disponibles = self.juego.get_last_dice_roll()
             
-            # Manejar tanto tuplas de 2 elementos como de 1 elemento
-            if len(dados_disponibles) == 2:
-                dado1, dado2 = dados_disponibles
-            elif len(dados_disponibles) == 1:
-                dado1 = dados_disponibles[0]
-                dado2 = None
+            # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
+            if len(dados_disponibles) >= 1:
+                # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
+                dados_a_procesar = list(dados_disponibles)
             else:
                 return
                 
@@ -454,9 +450,6 @@ class TableroBackgammon:
             
             # Calcular posibles destinos
             jugador_actual = self.juego.get_current_player()
-            dados_a_procesar = [dado1]
-            if dado2 is not None:
-                dados_a_procesar.append(dado2)
                 
             for dado in dados_a_procesar:
                 # En Backgammon:
@@ -517,26 +510,27 @@ class TableroBackgammon:
         if not self.dados:
             return
 
-        # Manejar tanto tuplas de 2 elementos como de 1 elemento
-        if len(self.dados) == 2:
-            dado1, dado2 = self.dados
+        # Manejar tuplas de cualquier longitud
+        # Dobles: (2,2,2,2) inicialmente, luego (2,2,2), (2,2), (2), ()
+        # Normales: (2,5) inicialmente, luego (5) o (2), luego ()
+        if len(self.dados) >= 2:
+            # Mostrar todos los dados disponibles (máximo 4 para dobles)
+            dados_a_dibujar = list(self.dados[:4])
         elif len(self.dados) == 1:
-            dado1 = self.dados[0]
-            dado2 = None
+            dados_a_dibujar = [self.dados[0]]
         else:
             return
             
         x_base = self.x_tablero + self.ancho_tablero // 2 - 50
         y_base = self.y_tablero + self.alto_tablero // 2 - 25
         lado = 40
-
-        # Dibujar los dados
-        dados_a_dibujar = [dado1]
-        if dado2 is not None:
-            dados_a_dibujar.append(dado2)
+        
+        # Ajustar posición inicial si hay más de 2 dados
+        if len(dados_a_dibujar) > 2:
+            x_base = x_base - (len(dados_a_dibujar) - 2) * 30
             
         for i, valor in enumerate(dados_a_dibujar):
-            x = x_base + i * 60
+            x = x_base + i * (60 if len(dados_a_dibujar) <= 2 else 50)
             # Cuadrado del dado
             pygame.draw.rect(
                 self.pantalla,
@@ -628,7 +622,12 @@ class TableroBackgammon:
         dados_disponibles = self.juego.get_last_dice_roll()
         if not dados_disponibles:
             return False
-        valores_dados = list(dados_disponibles)
+        # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
+        if len(dados_disponibles) >= 1:
+            # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
+            valores_dados = list(dados_disponibles)
+        else:
+            valores_dados = []
         puntos_validos = []
         for valor_dado in valores_dados:
             if color_jugador == "white":
