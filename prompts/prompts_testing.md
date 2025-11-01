@@ -1786,3 +1786,66 @@ if __name__ == '__main__':
 ## Uso de la respuesta
 
 Se usó el código sin cambios.
+
+## Prompt [8]
+
+**Fecha**: 31-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: corrección de errores en tests
+
+## Prompt enviado
+
+corregí todos estos errores: [list of 14 test errors]
+
+### Respuesta recibida
+
+Se corrigieron múltiples errores en tests:
+- Se corrigió uso de claves de diccionario en `Board` para usar `player.get_color()` en lugar de objetos `Player`.
+- Se corrigieron rangos de home board en múltiples archivos.
+- Se actualizaron tests para reflejar la nueva lógica de dobles y bear off.
+- Se corrigieron validaciones de movimiento y condiciones de victoria.
+
+### Uso de la respuesta
+
+Todos los tests ahora pasan correctamente.
+
+## Prompt [9]
+
+**Fecha**: 31-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: ajuste de tests
+
+## Prompt enviado
+
+ajustalos
+
+### Respuesta recibida
+
+Se ajustaron los tests para reflejar los cambios en la lógica del juego, incluyendo nuevos rangos de home board y validaciones actualizadas.
+
+### Uso de la respuesta
+
+Los tests están sincronizados con la lógica actual del juego.
+
+## Prompt [10]
+
+**Fecha**: 31-10-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: aumento de cobertura de código mediante tests
+
+## Prompt enviado
+
+ayudame a subir el porcentaje de coverage, minimo tiene q ser un 90%@core/ solo corregi cosas de core, nada de tests
+
+### Respuesta recibida
+
+Se agregaron nuevos tests para aumentar la cobertura:
+- Tests para `get_player2_checkers()`, `roll_dice()` con dobles.
+- Tests exhaustivos para bear off en múltiples escenarios (exact match, larger dice, remaining dice).
+- Tests para movimientos desde barra con diferentes casos (captura, bloqueado, inválido).
+- Tests para validaciones internas de movimientos.
+- Tests para setters en `Dice` y `Player`.
+
+### Uso de la respuesta
+
+La cobertura del módulo `core/` ahora supera el 90% como se requería.

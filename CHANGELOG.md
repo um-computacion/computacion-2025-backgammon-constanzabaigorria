@@ -12,6 +12,33 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Se corrigió la lógica de dobles: cuando sale un doble (ej: 2,2), ahora se guarda como (2,2,2,2) permitiendo 4 movimientos del mismo valor según las reglas del Backgammon
 - Se actualizó la visualización de dados en la UI para mostrar correctamente los 4 movimientos disponibles en dobles
 - Se corrigió el consumo de movimientos en dobles para que cada movimiento reste un valor de la tupla hasta agotar los 4 movimientos
+- Se implementó condición de victoria: el jugador gana cuando completa el bear off de todas sus fichas (15 fichas)
+- Se agregó mensaje de victoria en la UI que se muestra cuando un jugador gana el juego
+- Se implementó límite visual de 6 fichas apiladas con indicador numérico cuando hay más fichas
+- Se mejoró la visualización del conteo de bear off con fondos y bordes para mejor legibilidad
+- Se ajustó el botón "Tirar Dado" para que tenga mejor tamaño y legibilidad
+- Se agregaron nuevos tests para aumentar la cobertura del código al 90%+ en el módulo `core/`
+- Se implementaron tests adicionales para cubrir casos edge de bear off, reingreso desde barra y validaciones de movimientos
+
+### Fixed
+- Se corrigió la lógica de bear off para fichas blancas: ahora incluye correctamente el punto 24 en el home board
+- Se corrigió el rango del home board de blancas de `range(18, 23)` a `range(18, 24)` en múltiples archivos
+- Se corrigió la validación de movimientos desde punto 24 para bear off de fichas blancas
+- Se corrigió el uso de claves de diccionario en métodos de `Board` para usar `player.get_color()` en lugar de objetos `Player`
+- Se eliminaron variables no usadas (`boton_y_bottom`) en la UI
+- Se corrigieron todas las excepciones genéricas `Exception` en `cli/cli.py` para usar excepciones más específicas
+- Se corrigió el nombre de variable `bar` a `bar_checkers` en `cli/cli.py` para cumplir con convenciones de nombres
+- Se corrigieron variables con caracteres no ASCII (`tamaño_fuente` → `tamano_fuente`, `fuente_pequeña` → `fuente_pequena`)
+- Se dividieron líneas largas (más de 100 caracteres) en múltiples archivos para cumplir con PEP 8
+- Se eliminó todo el trailing whitespace en todos los archivos del proyecto
+- Se corrigieron argumentos no usados agregando `# pylint: disable=unused-argument` donde es apropiado
+- Se agregaron comentarios de pylint para deshabilitar warnings apropiados (`disallowed-name`, `import-outside-toplevel`)
+- Se corrigieron imports condicionales en `main.py` con comentarios apropiados de pylint
+
+### Changed
+- Se mejoró la organización visual de la UI para evitar superposiciones entre elementos
+- Se ajustó el posicionamiento del mensaje de victoria para no tapar otros elementos de la UI
+- Se estandarizó el estilo visual de contadores y botones para mantener consistencia
 
 ## [Sprint 5] – 2025-10-30
 
