@@ -25,7 +25,7 @@ class CLIInterface:
     def _display_board_(self) -> None:
         """
         Muestra el tablero actual con visualización mejorada.
-        
+
         Incluye:
         - Estado de fichas en cada punto
         - Fichas en la barra
@@ -63,13 +63,13 @@ class CLIInterface:
     def _display_board_visualization_(self, board) -> None:
         """
         Muestra una visualización completa del tablero de Backgammon.
-        
+
         Args:
             board: Instancia del tablero
         """
         # Obtener información del tablero
         points = board.get_points()
-        bar = board.get_bar()
+        bar_checkers = board.get_bar()
         bear_off = board.get_off_board()
         # Contar fichas por color en cada punto
         white_points = {}
@@ -85,7 +85,7 @@ class CLIInterface:
         white_bar = 0
         black_bar = 0
         # La barra puede usar objetos Player como claves
-        for key, checkers in bar.items():
+        for key, checkers in bar_checkers.items():
             if isinstance(key, str):
                 if key == "white":
                     white_bar = len(checkers)
@@ -198,7 +198,7 @@ class CLIInterface:
     def _display_dice_(self, dice: list) -> None:
         """
         Muestra los dados de forma visual.
-        
+
         Args:
             dice: Lista con valores de los dados
         """
@@ -207,10 +207,10 @@ class CLIInterface:
     def _get_player_move_(self, player_name: str) -> str:
         """
         Solicita un movimiento al jugador con manejo de errores.
-        
+
         Args:
             player_name: Nombre del jugador actual
-            
+
         Returns:
             Comando ingresado por el usuario
         """
@@ -225,13 +225,13 @@ class CLIInterface:
             except EOFError:
                 print("\n\n Fin de entrada. Saliendo...")
                 raise SystemExit from None
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 print("Entrada inválida. Intente nuevamente.")
 
     def _display_winner_(self, winner: str) -> None:
         """
         Muestra el ganador con estilo.
-        
+
         Args:
             winner: Nombre del ganador
         """
@@ -258,7 +258,7 @@ class CLIInterface:
     def run(self) -> None:
         """
         Ejecuta el loop principal del CLI.
-        
+
         Maneja la interacción con el usuario y el flujo del juego.
         """
         self._run_()
@@ -266,7 +266,7 @@ class CLIInterface:
     def _handle_command_(self, command: str) -> None:
         """
         Procesa y ejecuta un comando del usuario.
-        
+
         Args:
             command: Comando ingresado por el usuario
         """
@@ -338,7 +338,7 @@ class CLIInterface:
             try:
                 self._game_.start_game()
                 print("  ✓ Juego iniciado")
-            except Exception as e:
+            except (ValueError, AttributeError) as e:
                 print(f"  Error al iniciar juego: {e}")
                 return
         try:
@@ -352,10 +352,10 @@ class CLIInterface:
                     self._moves_remaining_ = 2
             else:
                 self._moves_remaining_ = 2
-            
+
             print(f" Movimientos disponibles: {self._moves_remaining_}")
             print("  Ahora puedes usar 'move' para hacer un movimiento")
-        except Exception as e:
+        except (ValueError, AttributeError, RuntimeError) as e:
             print(f" Error al tirar dados: {e}")
 
     def _cmd_move_(self) -> None:
@@ -382,19 +382,19 @@ class CLIInterface:
                 print(f"\n Movimiento exitoso: {from_point} → {to_point}")
                 self._moves_remaining_ -= 1
                 print(f" Movimientos restantes: {self._moves_remaining_}")
-                
+
                 self._display_board_()
-                
+
                 # Verificar si se completaron todos los movimientos
                 if self._moves_remaining_ <= 0:
                     print("\n  ✓ Todos los movimientos completados. Cambiando de jugador...")
                     try:
                         self._game_.end_turn()
                         print("  ✓ Turno terminado")
-                    except Exception as e:
+                    except (ValueError, AttributeError, RuntimeError) as e:
                         print(f"  Error al terminar turno: {e}")
                     self._display_board_()
-                
+
                 # Verificar si hay ganador
                 if self._game_.is_finished():
                     winner = self._game_.get_winner()
@@ -405,7 +405,7 @@ class CLIInterface:
                 print("\n Movimiento inválido. Intenta de nuevo.")
         except ValueError as e:
             print(f"\n  Error: {e}")
-        except Exception as e:
+        except (AttributeError, RuntimeError, TypeError) as e:
             print(f"\n  Error inesperado: {e}")
 
     def _cmd_status_(self) -> None:
@@ -423,7 +423,7 @@ class CLIInterface:
             else:
                 player_str = str(current)
             print(f"  ║  Jugador: {player_str:^18} ║")
-        except Exception:
+        except (AttributeError, TypeError):  # pylint: disable=broad-exception-caught
             print("  ║  Jugador: No disponible      ║")
         # Mostrar estado de dados
         if self._game_.has_dice_been_rolled():
@@ -431,7 +431,7 @@ class CLIInterface:
             print(f"  ║  Dados: {dice[0]}, {dice[1]}" + " " * 8 + "║")
         else:
             print("  ║  Dados: Aún no tirados" + " " * 7 + "║")
-        
+
         # Mostrar movimientos restantes
         print(f"  ║  Movimientos restantes: {self._moves_remaining_}" + " " * 8 + "║")
         print("  ╚═══════════════════════════════╝")
@@ -442,16 +442,16 @@ class CLIInterface:
             current = self._game_.get_current_player()
             current_str = current.get_name() if hasattr(current, 'get_name') else str(current)
             print(f"\n Terminando turno de {current_str}")
-        except Exception:
+        except (AttributeError, TypeError):  # pylint: disable=broad-exception-caught
             print("\n Terminando turno...")
-        
+
         # Cambiar de jugador
         try:
             self._game_.end_turn()
             print("  ✓ Turno terminado")
-        except Exception as e:
+        except (ValueError, AttributeError, RuntimeError) as e:
             print(f"  Error al terminar turno: {e}")
-        
+
         self._display_board_()
 
     def _cmd_quit_(self) -> None:
@@ -468,12 +468,12 @@ class CLIInterface:
     ) -> Optional[int]:
         """
         Solicita un número entero con validación.
-        
+
         Args:
             prompt: Mensaje a mostrar
             min_value: Valor mínimo aceptado
             max_value: Valor máximo aceptado
-            
+
         Returns:
             Número ingresado o None si es inválido
         """
@@ -501,10 +501,10 @@ class CLIInterface:
     def _parse_command_(self, command: str) -> dict:
         """
         Parsea un comando del usuario.
-        
+
         Args:
             command: Comando a parsear
-            
+
         Returns:
             Diccionario con el comando parseado
         """
@@ -527,11 +527,11 @@ class CLIInterface:
     def _validate_move_(self, from_point: int, to_point: int) -> bool:
         """
         Valida si un movimiento es permitido.
-        
+
         Args:
             from_point: Punto de origen
             to_point: Punto de destino
-            
+
         Returns:
             True si el movimiento es válido
         """
@@ -539,14 +539,14 @@ class CLIInterface:
 
     def _format_board_display_(
         self,
-        board_state: Optional[dict] = None
+        board_state: Optional[dict] = None  # pylint: disable=unused-argument
     ) -> str:
         """
         Formatea el tablero para display.
-        
+
         Args:
             board_state: Estado opcional del tablero
-            
+
         Returns:
             String con el tablero formateado
         """
@@ -564,7 +564,7 @@ class CLIInterface:
     def _display_message_(self, message: str) -> None:
         """
         Muestra un mensaje informativo.
-        
+
         Args:
             message: Mensaje a mostrar
         """
@@ -573,7 +573,7 @@ class CLIInterface:
     def _display_error_(self, error: str) -> None:
         """
         Muestra un mensaje de error.
-        
+
         Args:
             error: Mensaje de error
         """
@@ -601,7 +601,7 @@ class CLIInterface:
     def _run_(self) -> None:
         """
         Loop principal privado del juego.
-        
+
         Maneja la lógica del juego hasta que termine.
         """
         self._running_ = True
@@ -610,7 +610,7 @@ class CLIInterface:
         try:
             self._game_.start_game()
             print("\n  ✓ Juego iniciado")
-        except Exception as e:
+        except (ValueError, AttributeError, RuntimeError) as e:
             print(f"\n  Error al iniciar juego: {e}")
         self._display_board_()
         while self._running_ and not self._game_.is_finished():
@@ -627,17 +627,17 @@ class CLIInterface:
                     break
             except SystemExit:
                 break
-            except Exception as e:
+            except (ValueError, AttributeError, RuntimeError, TypeError) as e:
                 print(f"Error: {e}")
 
 
 def run_cli(game: Optional[BackgammonGame] = None) -> None:
     """
     Función de conveniencia para ejecutar el CLI.
-    
+
     Args:
         game: Instancia opcional de juego existente
-    
+
     Esta función puede ser llamada desde otro módulo.
     """
     cli = CLIInterface(game=game)

@@ -16,7 +16,7 @@ class Board:
         Inicializa el tablero con 24 puntos vacíos.
         """
         self.points: List[List['Checker']] = [[] for _ in range(24)]
-        self.bar: Dict[str, List['Checker']] = {"white": [], "black": []}
+        self.bar: Dict[str, List['Checker']] = {"white": [], "black": []}  # pylint: disable=disallowed-name
         self.bear_off: Dict[str, List['Checker']] = {"white": [], "black": []}
 
     def get_points(self) -> List[List[Checker]]:
@@ -123,14 +123,15 @@ class Board:
 
     def get_off_board_checkers_count(self, player: Player) -> int:
         """Devuelve la cantidad de fichas fuera del tablero para el jugador."""
-        return len(self.bear_off.get(player, []))
+        color = player.get_color()
+        return len(self.bear_off.get(color, []))
 
     def add_checker_off_board(self, checker: Checker) -> None:
         """Agrega una ficha fuera del tablero."""
-        owner = checker.get_owner()
-        if owner not in self.bear_off:
-            self.bear_off[owner] = []
-        self.bear_off[owner].append(checker)
+        color = checker.get_color()
+        if color not in self.bear_off:
+            self.bear_off[color] = []
+        self.bear_off[color].append(checker)
 
     def get_bar(self) -> Dict[Player, List[Checker]]:
         """Devuelve la barra de fichas."""
@@ -213,7 +214,7 @@ class Board:
 
     def __str__(self) -> str:
         """
-        Devuelve una representación simple del tablero mostrando la cantidad de fichas en cada punto.
+        Devuelve una representación simple del tablero mostrando la cantidad de fichas en cada punto
         """
         return str([len(point) for point in self.points])
 
@@ -244,17 +245,20 @@ class Board:
                     pip += (24 - i) if player.get_color() == "white" else (i + 1)
         return pip
 
-    def get_moves_to_bear_off(self, player: Player) -> List[Any]:
+    def get_moves_to_bear_off(self, player: Player) -> List[Any]:  # pylint: disable=unused-argument
         """
         Devuelve los movimientos posibles para sacar fichas del tablero.
 
         Args:
             player (Player): El jugador para el que se calculan los movimientos.
+                (No usado actualmente, mantenido para compatibilidad de API)
 
         Returns:
             List[Any]: Lista de movimientos posibles para sacar fichas.
         """
         # Implementación de ejemplo: retorna una lista vacía.
+        # El parámetro player se mantiene para compatibilidad de API
+        _ = player  # Marcar como usado para evitar warning
         return []
 
     def is_race_position(self) -> bool:
