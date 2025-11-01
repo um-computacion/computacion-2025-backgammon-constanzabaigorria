@@ -100,7 +100,8 @@ class Board:
 
     def get_bar_checkers_count(self, player: Player) -> int:
         """Devuelve la cantidad de fichas en la barra para el jugador."""
-        return len(self.bar.get(player, []))
+        color = player.get_color()
+        return len(self.bar.get(color, []))
 
     def add_checker_to_bar(self, checker: Checker) -> None:
         """Agrega una ficha a la barra."""
@@ -156,7 +157,10 @@ class Board:
         """Indica si el jugador puede sacar fichas del tablero."""
         if self.has_checkers_on_bar(player):
             return False
-        home_points = range(19, 24) if player.get_color() == "white" else range(0, 6)
+        # Los puntos del tablero usan índices 0-based (0-23)
+        # Home board de blancas: puntos 19-24 (índices 18-23)
+        # Home board de negras: puntos 1-6 (índices 0-5)
+        home_points = range(18, 24) if player.get_color() == "white" else range(0, 6)
         for i in range(24):
             if i not in home_points:
                 for checker in self.points[i]:
@@ -257,7 +261,7 @@ class Board:
         if len(players) != 2:
             return True
         white_outside_home = any(
-            checker.get_owner().get_color() == "white" and not (19 <= i <= 23)
+            checker.get_owner().get_color() == "white" and not (18 <= i <= 23)
             for i, point in enumerate(self.points)
             for checker in point
         )

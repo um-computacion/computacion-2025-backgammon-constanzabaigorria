@@ -198,6 +198,10 @@ class BackgammonGame:
         else:
             return []
         
+        # Verificar si puede hacer bear off
+        color = self.__current_player.get_color()
+        can_bear = self.__board.can_bear_off(self.__current_player)
+        
         # Buscar fichas del jugador actual en el tablero
         for punto_idx in range(24):
             if self.__board.points[punto_idx]:
@@ -206,7 +210,6 @@ class BackgammonGame:
                     punto_num = punto_idx + 1
                     
                     # Calcular posibles destinos para cada dado
-                        
                     for dado in dados_a_procesar:
                         # En Backgammon:
                         # - Fichas blancas van hacia números más altos (1->24)
@@ -216,9 +219,21 @@ class BackgammonGame:
                         else:
                             destino = punto_num - dado
                             
+                        # Movimientos normales en el tablero
                         if 1 <= destino <= 24:
                             if self.is_valid_move(punto_num, destino):
                                 movimientos.append((punto_num, destino, dado))
+                        
+                        # Bear off: verificar si puede sacar fichas
+                        if can_bear:
+                            if color == "white" and 19 <= punto_num <= 24:
+                                # Bear off para blancas
+                                if self.is_valid_move(punto_num, 25):
+                                    movimientos.append((punto_num, 25, dado))
+                            elif color == "black" and 1 <= punto_num <= 6:
+                                # Bear off para negras
+                                if self.is_valid_move(punto_num, 0):
+                                    movimientos.append((punto_num, 0, dado))
                                 
         return movimientos
 
@@ -251,11 +266,8 @@ class BackgammonGame:
         primera_ficha = self.__board.points[punto_origen][0]
         if primera_ficha.get_owner() != self.__current_player:
             return False
-            
-        # Calcular la distancia del movimiento
-        distancia = abs(to_point - from_point)
         
-        # Verificar si la distancia coincide con algún valor de dado
+        # Obtener dados disponibles
         dados_disponibles = self.__last_dice_roll
         
         # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
@@ -265,10 +277,54 @@ class BackgammonGame:
         else:
             return False
             
+        # BEAR OFF: Verificar PRIMERO si el movimiento es bear off válido
+        color = self.__current_player.get_color()
+        home_points_white_idx = range(18, 24)  # Índices 0-based: puntos 19-24 (18-23)
+        home_points_black_idx = range(0, 6)    # Índices 0-based: puntos 1-6 (0-5)
+        
+        if color == "white" and from_point >= 19 and from_point <= 24 and to_point == 25:
+            # Bear off válido si todas las fichas están en home board
+            if self.__board.can_bear_off(self.__current_player):
+                # Verificar que el dado permita este movimiento
+                movimiento = 25 - from_point
+                if movimiento <= 0:
+                    movimiento = 1
+                if movimiento in valores_dados:
+                    return True
+                # Permitir usar dado mayor solo si es la ficha más atrasada
+                # Buscar la ficha más lejana (mayor índice, ya que blanco viene de 0)
+                punto_origen_idx = from_point - 1
+                max_pos = max([i for i in home_points_white_idx if self.__board.points[i] and 
+                               self.__board.points[i][0].get_owner() == self.__current_player], default=None)
+                if max_pos is not None and punto_origen_idx == max_pos:
+                    return any(dado >= movimiento for dado in valores_dados)
+            return False
+        elif color == "black" and from_point >= 1 and from_point <= 6 and to_point == 0:
+            # Bear off válido si todas las fichas están en home board
+            if self.__board.can_bear_off(self.__current_player):
+                # Verificar que el dado permita este movimiento
+                movimiento = from_point
+                if movimiento <= 0:
+                    movimiento = 1
+                if movimiento in valores_dados:
+                    return True
+                # Permitir usar dado mayor solo si es la ficha más atrasada
+                # Buscar la ficha más lejana (menor índice, ya que negro viene de 23)
+                punto_origen_idx = from_point - 1
+                min_pos = min([i for i in home_points_black_idx if self.__board.points[i] and 
+                               self.__board.points[i][0].get_owner() == self.__current_player], default=None)
+                if min_pos is not None and punto_origen_idx == min_pos:
+                    return any(dado >= movimiento for dado in valores_dados)
+            return False
+            
+        # Si no es bear off, verificar movimiento normal
+        # Calcular la distancia del movimiento
+        distancia = abs(to_point - from_point)
+        
         if distancia not in valores_dados:
             return False
             
-        # Verificar que el punto de destino sea válido
+        # Verificar que el punto de destino sea válido (no bear off)
         if to_point < 1 or to_point > 24:
             return False
             
@@ -304,62 +360,77 @@ class BackgammonGame:
         jugador = self.__current_player
         board = self.__board
         color = jugador.get_color()
-        home_points = range(19, 24) if color == "white" else range(0, 6)
+        home_points_white_idx = range(18, 24)  # Índices 0-based: puntos 19-24 (18-23)
+        home_points_black_idx = range(0, 6)     # Índices 0-based: puntos 1-6 (0-5)
         # BEAR OFF
-        if (color == "white" and from_point >= 19 and to_point == 25) or (color == "black" and from_point <= 6 and to_point == 0):
-            # Validar si realmente puede bear off (todas en home y movimiento legal)
-            if not board.can_bear_off(jugador):
-                return False
-            # Verificar dado válido:
-            movimiento = (to_point - from_point) if color == "white" else (from_point - to_point)
+        # Si is_valid_move ya validó que es bear off válido, proceder directamente
+        if (color == "white" and from_point >= 19 and from_point <= 24 and to_point == 25) or \
+           (color == "black" and from_point >= 1 and from_point <= 6 and to_point == 0):
+            # is_valid_move ya validó can_bear_off y los dados, así que proceder
+            # Calcular el movimiento requerido (ya validado en is_valid_move)
+            if color == "white":
+                movimiento = 25 - from_point
+            else:
+                movimiento = from_point
+            
             if movimiento <= 0:
-                movimiento = 1  # Sacar solo si justo en el extremo
+                movimiento = 1
+                
             # Valores de dado posibles que permiten bear off
-            # dados_disponibles ya puede ser (2,2,2,2) si es doble o (2,5) si es normal
             dados_a_procesar = list(dados_disponibles)
-            chequeo = False
-            movimiento_abs = abs(movimiento)
+            
             # Buscar si el movimiento exacto está disponible
-            if movimiento_abs in dados_a_procesar:
-                chequeo = True
-                dados_a_procesar.remove(movimiento_abs)
+            if movimiento in dados_a_procesar:
+                dados_a_procesar.remove(movimiento)
                 # Actualizar dados restantes
                 if dados_a_procesar:
                     self.__last_dice_roll = tuple(dados_a_procesar)
                 else:
                     self.__last_dice_roll = ()
             else:
-                # Permitir sacar con dado mayor solo si no hay ficha detrás
-                max_pos = max([i for i in home_points if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
-                min_pos = min([i for i in home_points if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
+                # Permitir sacar con dado mayor solo si es la ficha más atrasada
+                # (Esta validación ya pasó en is_valid_move, pero la repetimos para usar el dado correcto)
+                max_pos = max([i for i in home_points_white_idx if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
+                min_pos = min([i for i in home_points_black_idx if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
+                
+                puede_usar_mayor = False
+                movimiento_requerido = movimiento
                 if color == "white" and max_pos is not None and punto_origen == max_pos:
-                    usable = any(dado >= (25 - from_point) for dado in dados_a_procesar)
+                    puede_usar_mayor = True
                 elif color == "black" and min_pos is not None and punto_origen == min_pos:
-                    usable = any(dado >= (from_point) for dado in dados_a_procesar)
-                else:
-                    usable = False
-                if usable:
-                    # Usar el primer dado mayor disponible
+                    puede_usar_mayor = True
+                
+                if puede_usar_mayor:
+                    # Buscar un dado mayor o igual al movimiento requerido
                     dado_usado = None
                     for dado in sorted(dados_a_procesar, reverse=True):
-                        if (color == "white" and dado >= (25 - from_point)) or (color == "black" and dado >= from_point):
+                        if dado >= movimiento_requerido:
                             dado_usado = dado
                             break
+                    
                     if dado_usado:
                         dados_a_procesar.remove(dado_usado)
                         if dados_a_procesar:
                             self.__last_dice_roll = tuple(dados_a_procesar)
                         else:
                             self.__last_dice_roll = ()
-                        chequeo = True
                     else:
+                        # Esto no debería ocurrir si is_valid_move validó correctamente
                         return False
                 else:
+                    # Esto no debería ocurrir si is_valid_move validó correctamente
                     return False
+            
             # Efectuar bear off
+            if not board.points[punto_origen]:
+                return False  # No debería ocurrir, pero por seguridad
             ficha_movida = board.points[punto_origen].pop()
             ficha_movida.move_off_board()
             board.bear_off[color].append(ficha_movida)
+            # Verificar victoria: si el jugador tiene 15 fichas en bear off, gana
+            if len(board.bear_off[color]) >= 15:
+                self.__winner = jugador
+                self.finish_game()
             # Fin de dados/turno
             if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
                 self.end_turn()
@@ -476,10 +547,19 @@ class BackgammonGame:
             # Fichas negras van hacia números más bajos desde la barra
             distancia = 25 - to_point
             
+        # Validar que la distancia esté disponible ANTES de remover la ficha
         if distancia not in valores_dados:
             return False
         
-        # Remover una ficha de la barra
+        # Validar actualización de dados ANTES de remover la ficha
+        valores_restantes = list(dados_disponibles)
+        if distancia in valores_restantes:
+            valores_restantes.remove(distancia)
+        else:
+            # Esto no debería ocurrir si la validación anterior es correcta
+            return False
+        
+        # Ahora SÍ remover una ficha de la barra (todas las validaciones pasaron)
         ficha_movida = self.__board.bar[color_jugador].pop()
         
         # Si hay una ficha del oponente en el destino, capturarla
@@ -497,26 +577,10 @@ class BackgammonGame:
         ficha_movida.set_position(punto_destino)
         ficha_movida.set_on_bar(False)
         
-        # Actualizar el estado de los dados
-        if len(dados_disponibles) >= 2:
-            # Puede ser doble (4 elementos) o normal (2 elementos)
-            valores_restantes = list(dados_disponibles)
-            # Remover un movimiento usado
-            if distancia in valores_restantes:
-                valores_restantes.remove(distancia)
-            else:
-                # Movimiento no coincide con ningún dado disponible
-                return False
-            # Si quedan valores, mantenerlos; si no, terminar turno
-            if valores_restantes:
-                self.__last_dice_roll = tuple(valores_restantes)
-            else:
-                self.__last_dice_roll = ()
-        elif len(dados_disponibles) == 1:
-            # Solo queda un dado, se usa y se termina el turno
-            self.__last_dice_roll = ()
+        # Actualizar el estado de los dados (ya validado arriba)
+        if valores_restantes:
+            self.__last_dice_roll = tuple(valores_restantes)
         else:
-            # No hay dados disponibles
             self.__last_dice_roll = ()
             
         # Si no quedan dados por usar, cambiar de turno
@@ -561,7 +625,7 @@ class BackgammonGame:
         Returns:
             bool: True si puede sacar fichas, False en caso contrario.
         """
-        return True
+        return self.__board.can_bear_off(player)
 
     def check_win_condition(self) -> bool:
         """Verifica la condición de victoria."""
