@@ -221,39 +221,27 @@ class BackgammonGame:
                             
                         # Movimientos normales en el tablero
                         if 1 <= destino <= 24:
-                            if self.is_valid_move(punto_num, destino):
+                            if self._is_valid_move_internal(punto_num, destino):
                                 movimientos.append((punto_num, destino, dado))
                         
                         # Bear off: verificar si puede sacar fichas
                         if can_bear:
                             if color == "white" and 19 <= punto_num <= 24:
                                 # Bear off para blancas
-                                if self.is_valid_move(punto_num, 25):
+                                if self._is_valid_move_internal(punto_num, 25):
                                     movimientos.append((punto_num, 25, dado))
                             elif color == "black" and 1 <= punto_num <= 6:
                                 # Bear off para negras
-                                if self.is_valid_move(punto_num, 0):
+                                if self._is_valid_move_internal(punto_num, 0):
                                     movimientos.append((punto_num, 0, dado))
                                 
         return movimientos
 
-    def is_valid_move(self, from_point: int, to_point: int) -> bool:
+    def _is_valid_move_internal(self, from_point: int, to_point: int) -> bool:
         """
-        Valida si un movimiento es válido basado en los dados lanzados.
-
-        Args:
-            from_point (int): Punto de origen.
-            to_point (int): Punto de destino.
-
-        Returns:
-            bool: True si el movimiento es válido, False en caso contrario.
+        Validación interna del movimiento sin verificar estado del juego.
+        Usado internamente por get_available_moves.
         """
-        if not self.__started or self.__finished:
-            return False
-        
-        if not self.__dice_rolled:
-            return False
-            
         # Verificar que el punto de origen tenga fichas del jugador actual
         if from_point < 1 or from_point > 24:
             return False
@@ -340,6 +328,31 @@ class BackgammonGame:
                     
         return True
 
+    def is_valid_move(self, from_point: int, to_point: int) -> bool:
+        """
+        Valida si un movimiento es válido basado en los dados lanzados.
+
+        Args:
+            from_point (int): Punto de origen.
+            to_point (int): Punto de destino.
+
+        Returns:
+            bool: True si el movimiento es válido, False en caso contrario.
+            
+        Raises:
+            ValueError: Si el juego no ha comenzado, ha terminado, o no se han lanzado los dados.
+        """
+        if not self.__started:
+            raise ValueError("El juego no ha comenzado")
+        
+        if self.__finished:
+            raise ValueError("El juego ha finalizado")
+        
+        if not self.__dice_rolled:
+            raise ValueError("Debes lanzar los dados primero")
+        
+        return self._is_valid_move_internal(from_point, to_point)
+
     def make_move(self, from_point: int, to_point: int) -> bool:
         """
         Realiza un movimiento en el tablero, incluyendo bear off.
@@ -349,8 +362,21 @@ class BackgammonGame:
             to_point (int): Punto de destino (1-24 o fuera del tablero).
         Returns:
             bool: True si el movimiento fue realizado, False en caso contrario.
+            
+        Raises:
+            ValueError: Si el juego no ha comenzado, ha terminado, o no se han lanzado los dados.
         """
-        if not self.is_valid_move(from_point, to_point):
+        # Validar estado del juego antes de intentar el movimiento
+        if not self.__started:
+            raise ValueError("El juego no ha comenzado")
+        
+        if self.__finished:
+            raise ValueError("El juego ha finalizado")
+        
+        if not self.__dice_rolled:
+            raise ValueError("Debes lanzar los dados primero")
+        
+        if not self._is_valid_move_internal(from_point, to_point):
             return False
         punto_origen = from_point - 1
         punto_destino = to_point - 1

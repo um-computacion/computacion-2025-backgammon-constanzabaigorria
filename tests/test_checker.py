@@ -187,7 +187,7 @@ class TestChecker(unittest.TestCase):
         self.assertTrue(self.__checker1__.is_in_home_board())
 
     def test_checker_is_in_home_board_white_false(self):
-        self.__checker1__.set_position(18)
+        self.__checker1__.set_position(17)  # Fuera del home board (home board: 18-23)
         self.assertFalse(self.__checker1__.is_in_home_board())
 
     def test_checker_is_in_home_board_black_true(self):
@@ -206,7 +206,7 @@ class TestChecker(unittest.TestCase):
         self.assertTrue(self.__checker1__.can_bear_off())
 
     def test_checker_can_bear_off_false_not_in_home(self):
-        self.__checker1__.set_position(18)
+        self.__checker1__.set_position(17)  # Fuera del home board (home board: 18-23)
         self.assertFalse(self.__checker1__.can_bear_off())
 
     def test_checker_can_bear_off_false_not_on_board(self):
