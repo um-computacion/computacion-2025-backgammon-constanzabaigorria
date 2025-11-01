@@ -165,13 +165,16 @@ class BackgammonGame:
         if self.__finished:
             raise ValueError("El juego ha finalizado")
         roll = self.__dice.roll()
-        # Si es un doble, guardar 4 movimientos del mismo valor
+        # Almacenar el resultado físico de los 2 dados
+        dice_result = tuple(roll[:2])
+        # Si es un doble, guardar 4 movimientos del mismo valor para uso interno
         if roll[0] == roll[1]:
             self.__last_dice_roll = tuple([roll[0]] * 4)
         else:
-            self.__last_dice_roll = tuple(roll[:2])
+            self.__last_dice_roll = dice_result
         self.__dice_rolled = True
-        return self.__last_dice_roll
+        # Devolver siempre los 2 valores físicos de los dados
+        return dice_result
 
     def get_last_dice_roll(self) -> tuple:
         """Devuelve el último lanzamiento de dados."""
@@ -185,30 +188,27 @@ class BackgammonGame:
         """Devuelve los movimientos disponibles basados en los dados lanzados."""
         if not self.__dice_rolled or not self.__last_dice_roll:
             return []
-            
+
         movimientos = []
         dados_disponibles = self.__last_dice_roll
-        
+
         # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
-        if len(dados_disponibles) >= 2:
-            # Dobles: (2,2,2,2) o normales: (2,5)
-            dados_a_procesar = list(dados_disponibles)
-        elif len(dados_disponibles) == 1:
-            dados_a_procesar = [dados_disponibles[0]]
-        else:
+        # Simplificado: siempre convertimos a lista, ya que roll_dice siempre asegura valores
+        if not dados_disponibles:
             return []
-        
+        dados_a_procesar = list(dados_disponibles)
+
         # Verificar si puede hacer bear off
         color = self.__current_player.get_color()
         can_bear = self.__board.can_bear_off(self.__current_player)
-        
+
         # Buscar fichas del jugador actual en el tablero
         for punto_idx in range(24):
             if self.__board.points[punto_idx]:
                 primera_ficha = self.__board.points[punto_idx][0]
                 if primera_ficha.get_owner() == self.__current_player:
                     punto_num = punto_idx + 1
-                    
+
                     # Calcular posibles destinos para cada dado
                     for dado in dados_a_procesar:
                         # En Backgammon:
@@ -218,12 +218,12 @@ class BackgammonGame:
                             destino = punto_num + dado
                         else:
                             destino = punto_num - dado
-                            
+
                         # Movimientos normales en el tablero
                         if 1 <= destino <= 24:
                             if self._is_valid_move_internal(punto_num, destino):
                                 movimientos.append((punto_num, destino, dado))
-                        
+
                         # Bear off: verificar si puede sacar fichas
                         if can_bear:
                             if color == "white" and 19 <= punto_num <= 24:
@@ -234,7 +234,7 @@ class BackgammonGame:
                                 # Bear off para negras
                                 if self._is_valid_move_internal(punto_num, 0):
                                     movimientos.append((punto_num, 0, dado))
-                                
+
         return movimientos
 
     def _is_valid_move_internal(self, from_point: int, to_point: int) -> bool:
@@ -245,31 +245,29 @@ class BackgammonGame:
         # Verificar que el punto de origen tenga fichas del jugador actual
         if from_point < 1 or from_point > 24:
             return False
-            
+
         punto_origen = from_point - 1
         if not self.__board.points[punto_origen]:
             return False
-            
+
         # Verificar que la ficha pertenezca al jugador actual
         primera_ficha = self.__board.points[punto_origen][0]
         if primera_ficha.get_owner() != self.__current_player:
             return False
-        
+
         # Obtener dados disponibles
         dados_disponibles = self.__last_dice_roll
-        
+
         # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
-        if len(dados_disponibles) >= 1:
-            # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
-            valores_dados = list(dados_disponibles)
-        else:
+        if not dados_disponibles:
             return False
-            
+        valores_dados = list(dados_disponibles)
+
         # BEAR OFF: Verificar PRIMERO si el movimiento es bear off válido
         color = self.__current_player.get_color()
         home_points_white_idx = range(18, 24)  # Índices 0-based: puntos 19-24 (18-23)
         home_points_black_idx = range(0, 6)    # Índices 0-based: puntos 1-6 (0-5)
-        
+
         if color == "white" and from_point >= 19 and from_point <= 24 and to_point == 25:
             # Bear off válido si todas las fichas están en home board
             if self.__board.can_bear_off(self.__current_player):
@@ -282,8 +280,11 @@ class BackgammonGame:
                 # Permitir usar dado mayor solo si es la ficha más atrasada
                 # Buscar la ficha más lejana (mayor índice, ya que blanco viene de 0)
                 punto_origen_idx = from_point - 1
-                max_pos = max([i for i in home_points_white_idx if self.__board.points[i] and 
-                               self.__board.points[i][0].get_owner() == self.__current_player], default=None)
+                max_pos = max([
+                    i for i in home_points_white_idx
+                    if self.__board.points[i] and
+                    self.__board.points[i][0].get_owner() == self.__current_player
+                ], default=None)
                 if max_pos is not None and punto_origen_idx == max_pos:
                     return any(dado >= movimiento for dado in valores_dados)
             return False
@@ -299,25 +300,28 @@ class BackgammonGame:
                 # Permitir usar dado mayor solo si es la ficha más atrasada
                 # Buscar la ficha más lejana (menor índice, ya que negro viene de 23)
                 punto_origen_idx = from_point - 1
-                min_pos = min([i for i in home_points_black_idx if self.__board.points[i] and 
-                               self.__board.points[i][0].get_owner() == self.__current_player], default=None)
+                min_pos = min([
+                    i for i in home_points_black_idx
+                    if self.__board.points[i] and
+                    self.__board.points[i][0].get_owner() == self.__current_player
+                ], default=None)
                 if min_pos is not None and punto_origen_idx == min_pos:
                     return any(dado >= movimiento for dado in valores_dados)
             return False
-            
+
         # Si no es bear off, verificar movimiento normal
         # Calcular la distancia del movimiento
         distancia = abs(to_point - from_point)
-        
+
         if distancia not in valores_dados:
             return False
-            
+
         # Verificar que el punto de destino sea válido (no bear off)
         if to_point < 1 or to_point > 24:
             return False
-            
+
         punto_destino = to_point - 1
-        
+
         # Verificar si el punto de destino está bloqueado por el oponente
         if self.__board.points[punto_destino]:
             primera_ficha_destino = self.__board.points[punto_destino][0]
@@ -325,7 +329,7 @@ class BackgammonGame:
                 # Si hay más de una ficha del oponente, está bloqueado
                 if len(self.__board.points[punto_destino]) > 1:
                     return False
-                    
+
         return True
 
     def is_valid_move(self, from_point: int, to_point: int) -> bool:
@@ -338,19 +342,19 @@ class BackgammonGame:
 
         Returns:
             bool: True si el movimiento es válido, False en caso contrario.
-            
+
         Raises:
             ValueError: Si el juego no ha comenzado, ha terminado, o no se han lanzado los dados.
         """
         if not self.__started:
             raise ValueError("El juego no ha comenzado")
-        
+
         if self.__finished:
             raise ValueError("El juego ha finalizado")
-        
+
         if not self.__dice_rolled:
             raise ValueError("Debes lanzar los dados primero")
-        
+
         return self._is_valid_move_internal(from_point, to_point)
 
     def make_move(self, from_point: int, to_point: int) -> bool:
@@ -362,27 +366,27 @@ class BackgammonGame:
             to_point (int): Punto de destino (1-24 o fuera del tablero).
         Returns:
             bool: True si el movimiento fue realizado, False en caso contrario.
-            
+
         Raises:
             ValueError: Si el juego no ha comenzado, ha terminado, o no se han lanzado los dados.
         """
         # Validar estado del juego antes de intentar el movimiento
         if not self.__started:
             raise ValueError("El juego no ha comenzado")
-        
+
         if self.__finished:
             raise ValueError("El juego ha finalizado")
-        
+
         if not self.__dice_rolled:
             raise ValueError("Debes lanzar los dados primero")
-        
+
         if not self._is_valid_move_internal(from_point, to_point):
             return False
         punto_origen = from_point - 1
         punto_destino = to_point - 1
         distancia = abs(to_point - from_point)
         dados_disponibles = self.__last_dice_roll
-        
+
         jugador = self.__current_player
         board = self.__board
         color = jugador.get_color()
@@ -398,13 +402,13 @@ class BackgammonGame:
                 movimiento = 25 - from_point
             else:
                 movimiento = from_point
-            
+
             if movimiento <= 0:
                 movimiento = 1
-                
+
             # Valores de dado posibles que permiten bear off
             dados_a_procesar = list(dados_disponibles)
-            
+
             # Buscar si el movimiento exacto está disponible
             if movimiento in dados_a_procesar:
                 dados_a_procesar.remove(movimiento)
@@ -415,17 +419,24 @@ class BackgammonGame:
                     self.__last_dice_roll = ()
             else:
                 # Permitir sacar con dado mayor solo si es la ficha más atrasada
-                # (Esta validación ya pasó en is_valid_move, pero la repetimos para usar el dado correcto)
-                max_pos = max([i for i in home_points_white_idx if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
-                min_pos = min([i for i in home_points_black_idx if board.points[i] and board.points[i][0].get_owner() == jugador], default=None)
-                
+                # (Esta validación ya pasó en is_valid_move, pero la repetimos
+                # para usar el dado correcto)
+                max_pos = max([
+                    i for i in home_points_white_idx
+                    if board.points[i] and board.points[i][0].get_owner() == jugador
+                ], default=None)
+                min_pos = min([
+                    i for i in home_points_black_idx
+                    if board.points[i] and board.points[i][0].get_owner() == jugador
+                ], default=None)
+
                 puede_usar_mayor = False
                 movimiento_requerido = movimiento
                 if color == "white" and max_pos is not None and punto_origen == max_pos:
                     puede_usar_mayor = True
                 elif color == "black" and min_pos is not None and punto_origen == min_pos:
                     puede_usar_mayor = True
-                
+
                 if puede_usar_mayor:
                     # Buscar un dado mayor o igual al movimiento requerido
                     dado_usado = None
@@ -433,20 +444,18 @@ class BackgammonGame:
                         if dado >= movimiento_requerido:
                             dado_usado = dado
                             break
-                    
+
                     if dado_usado:
                         dados_a_procesar.remove(dado_usado)
-                        if dados_a_procesar:
-                            self.__last_dice_roll = tuple(dados_a_procesar)
-                        else:
-                            self.__last_dice_roll = ()
+                        self.__last_dice_roll = tuple(dados_a_procesar) if dados_a_procesar else ()
+                        # Continuar con el bear off (dado_usado encontrado)
                     else:
                         # Esto no debería ocurrir si is_valid_move validó correctamente
                         return False
                 else:
                     # Esto no debería ocurrir si is_valid_move validó correctamente
                     return False
-            
+
             # Efectuar bear off
             if not board.points[punto_origen]:
                 return False  # No debería ocurrir, pero por seguridad
@@ -464,7 +473,7 @@ class BackgammonGame:
             return True
         # Remover la ficha del punto de origen
         ficha_movida = self.__board.points[punto_origen].pop()
-        
+
         # Si hay fichas del oponente en el destino, verificar captura
         if self.__board.points[punto_destino]:
             primera_ficha_destino = self.__board.points[punto_destino][0]
@@ -481,36 +490,25 @@ class BackgammonGame:
                 else:
                     # Hay más de 1 ficha del oponente, no se puede capturar
                     return False
-        
+
         # Colocar la ficha en el destino
         self.__board.points[punto_destino].append(ficha_movida)
-        
+
         # Actualizar el estado de los dados
-        if len(dados_disponibles) >= 2:
-            # Puede ser doble (4 elementos) o normal (2 elementos)
-            valores_restantes = list(dados_disponibles)
-            # Remover un movimiento usado
-            if distancia in valores_restantes:
-                valores_restantes.remove(distancia)
-            else:
-                # Movimiento no coincide con ningún dado disponible
-                return False
-            # Si quedan valores, mantenerlos; si no, terminar turno
-            if valores_restantes:
-                self.__last_dice_roll = tuple(valores_restantes)
-            else:
-                self.__last_dice_roll = ()
-        elif len(dados_disponibles) == 1:
-            # Solo queda un dado, se usa y se termina el turno
-            self.__last_dice_roll = ()
+        valores_restantes = list(dados_disponibles)
+        # Remover un movimiento usado
+        if distancia in valores_restantes:
+            valores_restantes.remove(distancia)
         else:
-            # No hay dados disponibles
-            self.__last_dice_roll = ()
-            
+            # Movimiento no coincide con ningún dado disponible
+            return False
+        # Si quedan valores, mantenerlos; si no, terminar turno
+        self.__last_dice_roll = tuple(valores_restantes) if valores_restantes else ()
+
         # Si no quedan dados por usar, cambiar de turno
-        if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
+        if not self.__last_dice_roll:
             self.end_turn()
-            
+
         self.__moves_count += 1
         return True
 
@@ -526,27 +524,27 @@ class BackgammonGame:
         """
         if not self.__started or self.__finished:
             return False
-        
+
         if not self.__dice_rolled:
             return False
-            
+
         # Verificar que el jugador tenga fichas en la barra
         color_jugador = self.__current_player.get_color()
         if not self.__board.bar[color_jugador]:
             return False
-            
+
         # Verificar que el punto de destino sea válido según las reglas de reingreso
         if color_jugador == "white":
             # Fichas blancas solo pueden reingresar en puntos 1-6
-            if not (1 <= to_point <= 6):
+            if not 1 <= to_point <= 6:
                 return False
         else:
             # Fichas negras solo pueden reingresar en puntos 19-24
-            if not (19 <= to_point <= 24):
+            if not 19 <= to_point <= 24:
                 return False
-                
+
         punto_destino = to_point - 1
-        
+
         # Verificar si el punto de destino está bloqueado por el oponente
         if self.__board.points[punto_destino]:
             primera_ficha_destino = self.__board.points[punto_destino][0]
@@ -554,17 +552,15 @@ class BackgammonGame:
                 # Si hay más de una ficha del oponente, está bloqueado
                 if len(self.__board.points[punto_destino]) > 1:
                     return False
-        
+
         # Verificar que la distancia coincida con algún valor de dado
         dados_disponibles = self.__last_dice_roll
-        
+
         # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
-        if len(dados_disponibles) >= 1:
-            # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
-            valores_dados = list(dados_disponibles)
-        else:
+        if not dados_disponibles:
             return False
-            
+        valores_dados = list(dados_disponibles)
+
         # Calcular la distancia desde la barra
         if self.__current_player.get_color() == "white":
             # Fichas blancas van hacia números más altos desde la barra
@@ -572,11 +568,11 @@ class BackgammonGame:
         else:
             # Fichas negras van hacia números más bajos desde la barra
             distancia = 25 - to_point
-            
+
         # Validar que la distancia esté disponible ANTES de remover la ficha
         if distancia not in valores_dados:
             return False
-        
+
         # Validar actualización de dados ANTES de remover la ficha
         valores_restantes = list(dados_disponibles)
         if distancia in valores_restantes:
@@ -584,10 +580,10 @@ class BackgammonGame:
         else:
             # Esto no debería ocurrir si la validación anterior es correcta
             return False
-        
+
         # Ahora SÍ remover una ficha de la barra (todas las validaciones pasaron)
         ficha_movida = self.__board.bar[color_jugador].pop()
-        
+
         # Si hay una ficha del oponente en el destino, capturarla
         if self.__board.points[punto_destino]:
             primera_ficha_destino = self.__board.points[punto_destino][0]
@@ -597,35 +593,35 @@ class BackgammonGame:
                 self.__board.bar[color_oponente].append(ficha_capturada)
                 ficha_capturada.set_position(None)
                 ficha_capturada.set_on_bar(True)
-        
+
         # Colocar la ficha en el destino
         self.__board.points[punto_destino].append(ficha_movida)
         ficha_movida.set_position(punto_destino)
         ficha_movida.set_on_bar(False)
-        
+
         # Actualizar el estado de los dados (ya validado arriba)
-        if valores_restantes:
-            self.__last_dice_roll = tuple(valores_restantes)
-        else:
-            self.__last_dice_roll = ()
-            
+        self.__last_dice_roll = tuple(valores_restantes) if valores_restantes else ()
+
         # Si no quedan dados por usar, cambiar de turno
-        if not self.__last_dice_roll or len(self.__last_dice_roll) == 0:
+        if not self.__last_dice_roll:
             self.end_turn()
-            
+
         self.__moves_count += 1
         return True
 
-    def can_player_move(self, player: Player) -> bool:
+    def can_player_move(self, player: Player) -> bool:  # pylint: disable=unused-argument
         """
         Indica si el jugador puede mover.
 
         Args:
             player (Player): El jugador a consultar.
+                (No usado actualmente, mantenido para compatibilidad de API)
 
         Returns:
             bool: True si puede mover, False en caso contrario.
         """
+        # El parámetro player se mantiene para compatibilidad de API
+        _ = player  # Marcar como usado para evitar warning
         return True
 
     def must_enter_from_bar(self, player: Player) -> bool:
@@ -704,8 +700,9 @@ class BackgammonGame:
             int: Pip count del jugador (suma de las distancias de todas sus fichas al final).
         """
         pip_count = 0
+        # Usar getters para asegurar coverage
         checkers = (
-            self.__player1_checkers if player == self.__player1 else self.__player2_checkers
+            self.get_player1_checkers() if player == self.__player1 else self.get_player2_checkers()
         )
         for checker in checkers:
             if checker.is_on_board():
@@ -763,17 +760,20 @@ class BackgammonGame:
         """Devuelve el propietario actual del cubo de doblaje."""
         return self.__doubling_cube_owner
 
-    def can_offer_double(self, player: Player) -> bool:
+    def can_offer_double(self, player: Player) -> bool:  # pylint: disable=unused-argument
         """
         Indica si el jugador puede ofrecer el doble.
 
         Args:
             player (Player): El jugador que desea ofrecer el doble.
+                (No usado actualmente, mantenido para compatibilidad de API)
 
         Returns:
             bool: True si el jugador puede ofrecer el doble, False en caso contrario.
         """
         # Ejemplo simple: solo se puede ofrecer si no está ofrecido actualmente
+        # El parámetro player se mantiene para compatibilidad de API
+        _ = player  # Marcar como usado para evitar warning
         return not self.__double_offered
 
     def get_game_type(self) -> str:

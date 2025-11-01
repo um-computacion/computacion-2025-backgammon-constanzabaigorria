@@ -22,7 +22,7 @@ def main() -> None:
     elif choice == "2":
         print("\nIniciando modo Pygame UI...\n")
         try:
-            from pygame_ui.pygameUI import main as run_pygame_ui
+            from pygame_ui.pygameUI import main as run_pygame_ui  # pylint: disable=import-outside-toplevel
             run_pygame_ui()
         except ImportError as e:
             print(f"Pygame UI no disponible: {e}")

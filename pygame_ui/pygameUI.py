@@ -7,9 +7,10 @@ Incluye control de eventos de ratón y renderizado del estado del juego.
 """
 
 import os
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-import pygame
 from typing import Tuple, Optional, List
+
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+import pygame  # pylint: disable=wrong-import-position
 from core.backgammongame import BackgammonGame
 
 
@@ -46,24 +47,24 @@ class Boton:
         ancho_boton = self.rect.width
         alto_boton = self.rect.height
         padding_texto = 6  # Padding mínimo dentro del botón
-        
+
         # Empezar con un tamaño más grande y reducir hasta que quepa
-        tamaño_fuente = 28
-        fuente = pygame.font.Font(None, tamaño_fuente)
+        tamano_fuente = 28
+        fuente = pygame.font.Font(None, tamano_fuente)
         texto = fuente.render(self.texto, True, self.color_texto)
-        
+
         # Reducir tamaño de fuente si el texto es demasiado ancho
-        while texto.get_width() > (ancho_boton - padding_texto) and tamaño_fuente > 20:
-            tamaño_fuente -= 1
-            fuente = pygame.font.Font(None, tamaño_fuente)
+        while texto.get_width() > (ancho_boton - padding_texto) and tamano_fuente > 20:
+            tamano_fuente -= 1
+            fuente = pygame.font.Font(None, tamano_fuente)
             texto = fuente.render(self.texto, True, self.color_texto)
-        
+
         # Asegurar que también quepa en altura
-        while texto.get_height() > (alto_boton - padding_texto) and tamaño_fuente > 20:
-            tamaño_fuente -= 1
-            fuente = pygame.font.Font(None, tamaño_fuente)
+        while texto.get_height() > (alto_boton - padding_texto) and tamano_fuente > 20:
+            tamano_fuente -= 1
+            fuente = pygame.font.Font(None, tamano_fuente)
             texto = fuente.render(self.texto, True, self.color_texto)
-        
+
         # Centrar perfectamente el texto dentro del botón
         texto_rect = texto.get_rect(center=self.rect.center)
         superficie.blit(texto, texto_rect)
@@ -83,7 +84,7 @@ class TableroBackgammon:
 
     def __init__(self, ancho: int = 950, alto: int = 650) -> None:
         """Inicializa la ventana y los parámetros visuales del tablero."""
-        pygame.init()  # type: ignore
+        pygame.init()  # pylint: disable=no-member
         self.ancho, self.alto = ancho, alto
         self.pantalla = pygame.display.set_mode((ancho, alto))
         pygame.display.set_caption("Backgammon Clásico Renovado")
@@ -181,17 +182,29 @@ class TableroBackgammon:
             x_blancas = self.x_bear + self.ancho_bear // 2
             for idx in range(fichas_blancas_a_dibujar):
                 y = self.y_bear + 50 + idx * (self.radio_ficha * 2 + 2)
-                pygame.draw.circle(self.pantalla, self.colores["ficha_blanca"], (x_blancas, y), self.radio_ficha)
-                pygame.draw.circle(self.pantalla, self.colores["borde"], (x_blancas, y), self.radio_ficha, 2)
+                pygame.draw.circle(
+                    self.pantalla, self.colores["ficha_blanca"], (x_blancas, y), self.radio_ficha
+                )
+                pygame.draw.circle(
+                    self.pantalla, self.colores["borde"], (x_blancas, y), self.radio_ficha, 2
+                )
             # Si hay más de 6 fichas blancas, mostrar número
             if total_blancas > 6:
                 fuente_numero = pygame.font.Font(None, 20)
-                texto_numero = fuente_numero.render(str(total_blancas), True, self.colores["texto"])
+                texto_numero = fuente_numero.render(
+                    str(total_blancas), True, self.colores["texto"]
+                )
                 y_num_blancas = self.y_bear + 50 + 6 * (self.radio_ficha * 2 + 2)
                 x_num_blancas = x_blancas - texto_numero.get_width() // 2
                 # Fondo para el número
-                pygame.draw.circle(self.pantalla, (255, 255, 255), (x_blancas, y_num_blancas), self.radio_ficha - 2)
-                self.pantalla.blit(texto_numero, (x_num_blancas, y_num_blancas - texto_numero.get_height() // 2))
+                pygame.draw.circle(
+                    self.pantalla, (255, 255, 255), (x_blancas, y_num_blancas),
+                    self.radio_ficha - 2
+                )
+                self.pantalla.blit(
+                    texto_numero,
+                    (x_num_blancas, y_num_blancas - texto_numero.get_height() // 2)
+                )
             # NEGRAS (abajo)
             negras_off = board.bear_off["black"]
             total_negras = len(negras_off)
@@ -199,8 +212,12 @@ class TableroBackgammon:
             x_negras = self.x_bear + self.ancho_bear // 2
             for idx in range(fichas_negras_a_dibujar):
                 y = self.y_bear + self.alto_tablero - 50 - idx * (self.radio_ficha * 2 + 2)
-                pygame.draw.circle(self.pantalla, self.colores["ficha_negra"], (x_negras, y), self.radio_ficha)
-                pygame.draw.circle(self.pantalla, self.colores["borde"], (x_negras, y), self.radio_ficha, 2)
+                pygame.draw.circle(
+                    self.pantalla, self.colores["ficha_negra"], (x_negras, y), self.radio_ficha
+                )
+                pygame.draw.circle(
+                    self.pantalla, self.colores["borde"], (x_negras, y), self.radio_ficha, 2
+                )
             # Si hay más de 6 fichas negras, mostrar número
             if total_negras > 6:
                 fuente_numero = pygame.font.Font(None, 20)
@@ -208,8 +225,14 @@ class TableroBackgammon:
                 y_num_negras = self.y_bear + self.alto_tablero - 50 - 6 * (self.radio_ficha * 2 + 2)
                 x_num_negras = x_negras - texto_numero.get_width() // 2
                 # Fondo para el número
-                pygame.draw.circle(self.pantalla, (255, 255, 255), (x_negras, y_num_negras), self.radio_ficha - 2)
-                self.pantalla.blit(texto_numero, (x_num_negras, y_num_negras - texto_numero.get_height() // 2))
+                pygame.draw.circle(
+                    self.pantalla, (255, 255, 255), (x_negras, y_num_negras),
+                    self.radio_ficha - 2
+                )
+                self.pantalla.blit(
+                    texto_numero,
+                    (x_num_negras, y_num_negras - texto_numero.get_height() // 2)
+                )
 
         # Dibujar fichas si hay juego activo
         if self.juego:
@@ -227,39 +250,49 @@ class TableroBackgammon:
         # Etiquetas en zona de bear off
         # Calcular tamaño de fuente que quepa en el ancho disponible
         ancho_disponible = self.ancho_bear - 8  # Dejar 4 píxeles de padding a cada lado
-        fuente_tamaño = 26  # Tamaño inicial más grande
-        fuente_bold = pygame.font.Font(None, fuente_tamaño)
+        fuente_tamano = 26  # Tamaño inicial más grande
+        fuente_bold = pygame.font.Font(None, fuente_tamano)
         # Probar si el texto más largo cabe, si no reducir fuente
         texto_prueba = fuente_bold.render("BLANCAS: 99", True, self.colores["texto"])
-        while texto_prueba.get_width() > ancho_disponible and fuente_tamaño > 18:
-            fuente_tamaño -= 1
-            fuente_bold = pygame.font.Font(None, fuente_tamaño)
+        while texto_prueba.get_width() > ancho_disponible and fuente_tamano > 18:
+            fuente_tamano -= 1
+            fuente_bold = pygame.font.Font(None, fuente_tamano)
             texto_prueba = fuente_bold.render("BLANCAS: 99", True, self.colores["texto"])
-        
-        fuente = pygame.font.Font(None, fuente_tamaño - 2)
+
+        fuente = pygame.font.Font(None, fuente_tamano - 2)
         # Mostrar la cantidad de fichas retiradas (bear off)
         if self.juego:
             board = self.juego.get_board()
             num_blancas = len(board.bear_off["white"])
             num_negras = len(board.bear_off["black"])
-            texto1 = fuente_bold.render(f"BLANCAS: {num_blancas}", True, self.colores["texto"])
-            texto2 = fuente_bold.render(f"NEGRAS: {num_negras}", True, self.colores["texto"])
-            
+            texto1 = fuente_bold.render(
+                f"BLANCAS: {num_blancas}", True, self.colores["texto"]
+            )
+            texto2 = fuente_bold.render(
+                f"NEGRAS: {num_negras}", True, self.colores["texto"]
+            )
+
             # Usar todo el ancho disponible menos un pequeño padding
             padding_x = 4
             rect1_w = self.ancho_bear - 2 * padding_x
             rect2_w = self.ancho_bear - 2 * padding_x
             rect1_x = self.x_bear + padding_x
             rect2_x = self.x_bear + padding_x
-            
+
             # Dibujar fondo para mejor visibilidad
-            rect1 = pygame.Rect(rect1_x, self.y_bear + self.alto_tablero // 4 - 15, rect1_w, texto1.get_height() + 8)
-            rect2 = pygame.Rect(rect2_x, self.y_bear + 3 * self.alto_tablero // 4 - 15, rect2_w, texto2.get_height() + 8)
+            rect1 = pygame.Rect(
+                rect1_x, self.y_bear + self.alto_tablero // 4 - 15,
+                rect1_w, texto1.get_height() + 8
+            )
+            rect2 = pygame.Rect(
+                rect2_x, self.y_bear + 3 * self.alto_tablero // 4 - 15,
+                rect2_w, texto2.get_height() + 8
+            )
             pygame.draw.rect(self.pantalla, (240, 230, 200), rect1, border_radius=5)
             pygame.draw.rect(self.pantalla, self.colores["borde"], rect1, 2, border_radius=5)
             pygame.draw.rect(self.pantalla, (240, 230, 200), rect2, border_radius=5)
             pygame.draw.rect(self.pantalla, self.colores["borde"], rect2, 2, border_radius=5)
-            
+
             # Centrar perfectamente el texto dentro del fondo
             texto1_x = rect1_x + (rect1_w - texto1.get_width()) // 2
             texto2_x = rect2_x + (rect2_w - texto2.get_width()) // 2
@@ -306,8 +339,14 @@ class TableroBackgammon:
                 if i % 2 == 0
                 else self.colores["punto_oscuro"]
             )
-            self._dibujar_triangulo(x, self.y_tablero, self.ancho_punto, self.alto_punto, color_arriba, abajo=True)
-            self._dibujar_triangulo(x, self.y_tablero + self.alto_tablero - self.alto_punto, self.ancho_punto, self.alto_punto, color_abajo, abajo=False)
+            self._dibujar_triangulo(
+                x, self.y_tablero, self.ancho_punto, self.alto_punto,
+                color_arriba, abajo=True
+            )
+            self._dibujar_triangulo(
+                x, self.y_tablero + self.alto_tablero - self.alto_punto,
+                self.ancho_punto, self.alto_punto, color_abajo, abajo=False
+            )
 
         # Lado derecho
         inicio_derecha = self.x_tablero + self.ancho_mitad + self.ancho_centro
@@ -323,8 +362,14 @@ class TableroBackgammon:
                 if i % 2 == 0
                 else self.colores["punto_claro"]
             )
-            self._dibujar_triangulo(x, self.y_tablero, self.ancho_punto, self.alto_punto, color_arriba, abajo=True)
-            self._dibujar_triangulo(x, self.y_tablero + self.alto_tablero - self.alto_punto, self.ancho_punto, self.alto_punto, color_abajo, abajo=False)
+            self._dibujar_triangulo(
+                x, self.y_tablero, self.ancho_punto, self.alto_punto,
+                color_arriba, abajo=True
+            )
+            self._dibujar_triangulo(
+                x, self.y_tablero + self.alto_tablero - self.alto_punto,
+                self.ancho_punto, self.alto_punto, color_abajo, abajo=False
+            )
 
         # Barra central
         pygame.draw.rect(
@@ -338,7 +383,10 @@ class TableroBackgammon:
             ),
         )
 
-    def _dibujar_triangulo(self, x: int, y: int, ancho: int, alto: int, color: Tuple[int, int, int], abajo: bool) -> None:
+    def _dibujar_triangulo(
+        self, x: int, y: int, ancho: int, alto: int,
+        color: Tuple[int, int, int], abajo: bool
+    ) -> None:
         """Dibuja un triángulo."""
         if abajo:
             puntos = [(x, y), (x + ancho, y), (x + ancho // 2, y + alto)]
@@ -365,13 +413,17 @@ class TableroBackgammon:
             fichas_en_punto = []
             if board.points[punto]:  # Si hay fichas en este punto
                 for ficha in board.points[punto]:
-                    color_ficha = self.colores["ficha_blanca"] if ficha.get_color() == "white" else self.colores["ficha_negra"]
+                    if ficha.get_color() == "white":
+                        color_ficha = self.colores["ficha_blanca"]
+                    else:
+                        color_ficha = self.colores["ficha_negra"]
                     fichas_en_punto.append((ficha.get_color(), color_ficha))
 
             # Dibujar las fichas (máximo 6 visualmente)
             total_fichas = len(fichas_en_punto)
             fichas_a_dibujar = min(total_fichas, 6)
-            espaciado_fichas = self.radio_ficha * 2 + 2  # Espaciado adecuado para evitar superposiciones
+            # Espaciado adecuado para evitar superposiciones
+            espaciado_fichas = self.radio_ficha * 2 + 2
             for idx in range(fichas_a_dibujar):
                 _, color_ficha = fichas_en_punto[idx]
                 y = y_base + (y_dir * idx * espaciado_fichas)
@@ -382,8 +434,12 @@ class TableroBackgammon:
                     self.radio_ficha
                 )
                 # Dibujar borde especial si la ficha está seleccionada
-                color_borde = self.colores["resaltado"] if self.seleccionado == punto else self.colores["borde"]
-                grosor_borde = 4 if self.seleccionado == punto else 2
+                if self.seleccionado == punto:
+                    color_borde = self.colores["resaltado"]
+                    grosor_borde = 4
+                else:
+                    color_borde = self.colores["borde"]
+                    grosor_borde = 2
                 pygame.draw.circle(
                     self.pantalla,
                     color_borde,
@@ -405,7 +461,10 @@ class TableroBackgammon:
                     (x_num, y_num),
                     self.radio_ficha - 2
                 )
-                self.pantalla.blit(texto_numero, (x_num_texto, y_num - texto_numero.get_height() // 2))
+                self.pantalla.blit(
+                    texto_numero,
+                    (x_num_texto, y_num - texto_numero.get_height() // 2)
+                )
 
     def _dibujar_fichas_barra(self) -> None:
         """Dibuja las fichas en la barra."""
@@ -436,11 +495,18 @@ class TableroBackgammon:
         # Si hay más de 6 fichas blancas en la barra, mostrar número
         if total_blancas_barra > 6:
             fuente_numero = pygame.font.Font(None, 18)
-            texto_numero = fuente_numero.render(str(total_blancas_barra), True, self.colores["texto"])
+            texto_numero = fuente_numero.render(
+                str(total_blancas_barra), True, self.colores["texto"]
+            )
             y_num = self.y_tablero + self.alto_tablero // 2 - 20 - (6 * espaciado_barra)
             x_num_texto = x_blancas_barra - texto_numero.get_width() // 2
-            pygame.draw.circle(self.pantalla, (255, 255, 255), (x_blancas_barra, y_num), self.radio_ficha - 2)
-            self.pantalla.blit(texto_numero, (x_num_texto, y_num - texto_numero.get_height() // 2))
+            pygame.draw.circle(
+                self.pantalla, (255, 255, 255), (x_blancas_barra, y_num),
+                self.radio_ficha - 2
+            )
+            self.pantalla.blit(
+                texto_numero, (x_num_texto, y_num - texto_numero.get_height() // 2)
+            )
         # Dibujar fichas negras en la barra
         fichas_negras_barra = board.bar["black"]
         total_negras_barra = len(fichas_negras_barra)
@@ -464,11 +530,18 @@ class TableroBackgammon:
         # Si hay más de 6 fichas negras en la barra, mostrar número
         if total_negras_barra > 6:
             fuente_numero = pygame.font.Font(None, 18)
-            texto_numero = fuente_numero.render(str(total_negras_barra), True, self.colores["texto"])
+            texto_numero = fuente_numero.render(
+                str(total_negras_barra), True, self.colores["texto"]
+            )
             y_num = self.y_tablero + self.alto_tablero // 2 - 20 - (6 * espaciado_barra)
             x_num_texto = x_negras_barra - texto_numero.get_width() // 2
-            pygame.draw.circle(self.pantalla, (255, 255, 255), (x_negras_barra, y_num), self.radio_ficha - 2)
-            self.pantalla.blit(texto_numero, (x_num_texto, y_num - texto_numero.get_height() // 2))
+            pygame.draw.circle(
+                self.pantalla, (255, 255, 255), (x_negras_barra, y_num),
+                self.radio_ficha - 2
+            )
+            self.pantalla.blit(
+                texto_numero, (x_num_texto, y_num - texto_numero.get_height() // 2)
+            )
 
     def _dibujar_barra_seleccionada(self) -> None:
         """Dibuja una indicación visual cuando la barra está seleccionada."""
@@ -520,7 +593,7 @@ class TableroBackgammon:
             else:
                 # Fichas negras solo pueden reingresar en puntos 19-24
                 if punto_destino < 19 or punto_destino > 24:
-                    continue 
+                    continue
             punto_idx = punto_destino - 1
             # Verificar si el punto está bloqueado por el oponente
             if board.points[punto_idx]:
@@ -539,7 +612,7 @@ class TableroBackgammon:
         # Usar la misma lógica que _calcular_x_punto y _calcular_y_base
         x = self._calcular_x_punto(punto_idx)
         y_base = self._calcular_y_base(punto_idx)
-        
+
         # Dibujar círculo verde
         pygame.draw.circle(
             self.pantalla,
@@ -553,27 +626,27 @@ class TableroBackgammon:
         """Dibuja los movimientos válidos para la ficha seleccionada."""
         if self.seleccionado is None or not self.juego:
             return
-            
+
         # Obtener movimientos válidos desde el punto seleccionado
         movimientos_validos = []
         if self.juego.has_dice_been_rolled():
             dados_disponibles = self.juego.get_last_dice_roll()
-            
+
             # Manejar tuplas de cualquier longitud (dobles tienen 4 elementos)
             if len(dados_disponibles) >= 1:
                 # Dobles: (2,2,2,2) o normales: (2,5) o parcial: (2,)
                 dados_a_procesar = list(dados_disponibles)
             else:
                 return
-                
+
             punto_seleccionado = self.seleccionado + 1
-            
+
             # Calcular posibles destinos
             jugador_actual = self.juego.get_current_player()
-                
+
             color = jugador_actual.get_color()
             can_bear = self.juego.can_bear_off(jugador_actual)
-            
+
             for dado in dados_a_procesar:
                 # En Backgammon:
                 # - Fichas blancas van hacia números más altos (1->24)
@@ -582,12 +655,12 @@ class TableroBackgammon:
                     destino = punto_seleccionado + dado
                 else:
                     destino = punto_seleccionado - dado
-                    
+
                 # Movimientos normales en el tablero
                 if 1 <= destino <= 24:
                     if self.juego.is_valid_move(punto_seleccionado, destino):
                         movimientos_validos.append(destino - 1)  # Convertir a índice 0-based
-            
+
             # Bear off: verificar SIEMPRE si puede sacar fichas (fuera del bucle de dados)
             if can_bear:
                 if color == "white" and 19 <= punto_seleccionado <= 24:
@@ -625,12 +698,12 @@ class TableroBackgammon:
                             self.radio_ficha + 8,
                             3
                         )
-        
+
         # Dibujar círculos de destino válidos
         for destino_idx in movimientos_validos:
             x = self._calcular_x_punto(destino_idx)
             y_base = self._calcular_y_base(destino_idx)
-            
+
             # Dibujar círculo de destino válido
             pygame.draw.circle(
                 self.pantalla,
@@ -682,7 +755,7 @@ class TableroBackgammon:
             dados_a_dibujar = [self.dados[0]]
         else:
             return
-            
+
         x_base = self.x_tablero + self.ancho_tablero // 2 - 50
         y_base = self.y_tablero + self.alto_tablero // 2 - 25
         lado = 40
@@ -690,7 +763,7 @@ class TableroBackgammon:
         # Ajustar posición inicial si hay más de 2 dados
         if len(dados_a_dibujar) > 2:
             x_base = x_base - (len(dados_a_dibujar) - 2) * 30
-            
+
         for i, valor in enumerate(dados_a_dibujar):
             x = x_base + i * (60 if len(dados_a_dibujar) <= 2 else 50)
             # Cuadrado del dado
@@ -748,78 +821,116 @@ class TableroBackgammon:
         texto_turno = f"Turno: {nombre_jugador}"
         texto_renderizado = fuente.render(texto_turno, True, self.colores["texto"])
         # Dibujar fondo para el texto
-        rect_fondo = pygame.Rect(x_info - 10, y_info - 5, texto_renderizado.get_width() + 20, texto_renderizado.get_height() + 10)
-        pygame.draw.rect(self.pantalla, self.colores["punto_claro"], rect_fondo, border_radius=5)
-        pygame.draw.rect(self.pantalla, self.colores["borde"], rect_fondo, 2, border_radius=5)
+        rect_fondo = pygame.Rect(
+            x_info - 10, y_info - 5,
+            texto_renderizado.get_width() + 20, texto_renderizado.get_height() + 10
+        )
+        pygame.draw.rect(
+            self.pantalla, self.colores["punto_claro"], rect_fondo, border_radius=5
+        )
+        pygame.draw.rect(
+            self.pantalla, self.colores["borde"], rect_fondo, 2, border_radius=5
+        )
         # Dibujar el texto
         self.pantalla.blit(texto_renderizado, (x_info, y_info))
         # Dibujar indicador de color del jugador
         radio_indicator = 8
-        color_ficha = self.colores["ficha_blanca"] if color_jugador == "white" else self.colores["ficha_negra"]
-        pygame.draw.circle(self.pantalla, color_ficha, (x_info - 15, y_info + texto_renderizado.get_height() // 2), radio_indicator)
-        pygame.draw.circle(self.pantalla, self.colores["borde"], (x_info - 15, y_info + texto_renderizado.get_height() // 2), radio_indicator, 2)
+        if color_jugador == "white":
+            color_ficha = self.colores["ficha_blanca"]
+        else:
+            color_ficha = self.colores["ficha_negra"]
+        centro_y = y_info + texto_renderizado.get_height() // 2
+        pygame.draw.circle(
+            self.pantalla, color_ficha, (x_info - 15, centro_y), radio_indicator
+        )
+        pygame.draw.circle(
+            self.pantalla, self.colores["borde"], (x_info - 15, centro_y),
+            radio_indicator, 2
+        )
 
     def _dibujar_victoria(self) -> None:
         """Dibuja el mensaje de victoria cuando el juego termina."""
         if not self.juego:
             return
-        
+
         ganador = self.juego.get_winner()
         if not ganador:
             return
-        
+
         # Centro del tablero (no de toda la pantalla para evitar tapar el botón)
         x_centro = self.x_tablero + self.ancho_tablero // 2
         # Posicionar un poco más arriba para no tapar el botón que está en el centro vertical
         y_centro = self.y_tablero + self.alto_tablero // 3
-        
+
         # Crear mensaje de victoria (tamaño más compacto)
         fuente_grande = pygame.font.Font(None, 42)
-        fuente_pequeña = pygame.font.Font(None, 28)
-        
+        fuente_pequena = pygame.font.Font(None, 28)
+
         nombre_ganador = ganador.get_name()
         color_ganador = ganador.get_color()
-        color_ficha = self.colores["ficha_blanca"] if color_ganador == "white" else self.colores["ficha_negra"]
-        
+        if color_ganador == "white":
+            color_ficha = self.colores["ficha_blanca"]
+        else:
+            color_ficha = self.colores["ficha_negra"]
+
         texto_victoria = f"¡{nombre_ganador} GANA!"
         texto_renderizado = fuente_grande.render(texto_victoria, True, (255, 215, 0))
-        
+
         # Dibujar texto de derrota para el otro jugador
-        jugador_perdedor = self.juego.get_player1() if ganador == self.juego.get_player2() else self.juego.get_player2()
+        if ganador == self.juego.get_player2():
+            jugador_perdedor = self.juego.get_player1()
+        else:
+            jugador_perdedor = self.juego.get_player2()
         nombre_perdedor = jugador_perdedor.get_name()
         texto_perdedor = f"{nombre_perdedor} ha perdido"
-        texto_perdedor_renderizado = fuente_pequeña.render(texto_perdedor, True, self.colores["texto"])
-        
+        texto_perdedor_renderizado = fuente_pequena.render(
+            texto_perdedor, True, self.colores["texto"]
+        )
+
         # Calcular dimensiones del panel (más compacto)
-        ancho_panel = max(texto_renderizado.get_width(), texto_perdedor_renderizado.get_width()) + 50
+        ancho_panel = max(
+            texto_renderizado.get_width(), texto_perdedor_renderizado.get_width()
+        ) + 50
         alto_panel = texto_renderizado.get_height() + texto_perdedor_renderizado.get_height() + 60
-        
+
         x_panel = x_centro - ancho_panel // 2
         y_panel = y_centro - alto_panel // 2
-        
-        # Verificar que no tape el botón (que está en y: self.y_tablero + self.alto_tablero // 2 - 25)
+
+        # Verificar que no tape el botón
+        # (que está en y: self.y_tablero + self.alto_tablero // 2 - 25)
         boton_y_top = self.y_tablero + self.alto_tablero // 2 - 25
-        boton_y_bottom = boton_y_top + 45
         panel_y_bottom = y_panel + alto_panel
-        
+
         # Si el panel está cerca del botón, moverlo más arriba
         if panel_y_bottom > boton_y_top - 10:
             y_panel = boton_y_top - alto_panel - 20
-        
+
         # Dibujar fondo del panel con semi-transparencia (simulado con color más claro)
-        pygame.draw.rect(self.pantalla, (250, 240, 210), (x_panel, y_panel, ancho_panel, alto_panel), border_radius=12)
-        pygame.draw.rect(self.pantalla, self.colores["borde"], (x_panel, y_panel, ancho_panel, alto_panel), 3, border_radius=12)
-        
+        pygame.draw.rect(
+            self.pantalla, (250, 240, 210),
+            (x_panel, y_panel, ancho_panel, alto_panel), border_radius=12
+        )
+        pygame.draw.rect(
+            self.pantalla, self.colores["borde"],
+            (x_panel, y_panel, ancho_panel, alto_panel), 3, border_radius=12
+        )
+
         # Dibujar texto de victoria
         x_texto_victoria = x_centro - texto_renderizado.get_width() // 2
         y_texto_victoria = y_panel + 20
         self.pantalla.blit(texto_renderizado, (x_texto_victoria, y_texto_victoria))
-        
+
         # Dibujar círculo con el color del ganador
         radio_ganador = 18
-        pygame.draw.circle(self.pantalla, color_ficha, (x_centro, y_texto_victoria + texto_renderizado.get_height() + 15), radio_ganador)
-        pygame.draw.circle(self.pantalla, self.colores["borde"], (x_centro, y_texto_victoria + texto_renderizado.get_height() + 15), radio_ganador, 2)
-        
+        y_circulo = y_texto_victoria + texto_renderizado.get_height() + 15
+        pygame.draw.circle(
+            self.pantalla, color_ficha, (x_centro, y_circulo), radio_ganador
+        )
+        pygame.draw.circle(
+            self.pantalla, self.colores["borde"], (x_centro, y_circulo),
+            radio_ganador, 2
+        )
+
         # Dibujar texto de derrota
         x_texto_perdedor = x_centro - texto_perdedor_renderizado.get_width() // 2
         y_texto_perdedor = y_texto_victoria + texto_renderizado.get_height() + 40
@@ -841,7 +952,8 @@ class TableroBackgammon:
             self.seleccionado = None  # Limpiar selección cuando cambia el turno
 
     def _tiene_reingreso_disponible(self) -> bool:
-        """Devuelve True si el jugador actual puede reingresar desde la barra con los dados actuales."""
+        """Devuelve True si el jugador actual puede reingresar desde la barra
+        con los dados actuales."""
         if not self.juego:
             return False
         jugador_actual = self.juego.get_current_player()
@@ -882,7 +994,7 @@ class TableroBackgammon:
         # No procesar eventos si el juego ha terminado
         if self.juego and self.juego.is_finished():
             return
-        
+
         if self.boton_dados.manejar_evento(evento):
             if self.juego and not self.juego.has_dice_been_rolled():
                 self.juego.roll_dice()
@@ -934,7 +1046,7 @@ class TableroBackgammon:
                         # Si el movimiento falló pero era válido, podría ser un error
                     self.seleccionado = None
                     return
-            
+
             punto_clicado = self._obtener_punto_clicado(x, y)
             if punto_clicado is not None:
                 if self.seleccionado is None:
@@ -985,17 +1097,18 @@ class TableroBackgammon:
         """Verifica si el clic fue en la zona de bear off."""
         if not self.juego:
             return False
-        # Verificar si está dentro del área de bear off (hacer el área más amplia para facilitar el clic)
+        # Verificar si está dentro del área de bear off
+        # (hacer el área más amplia para facilitar el clic)
         if self.x_bear <= x <= self.x_bear + self.ancho_bear:
             if self.y_bear <= y <= self.y_bear + self.alto_tablero:
                 jugador_actual = self.juego.get_current_player()
                 color = jugador_actual.get_color()
-                
+
                 # Calcular áreas más grandes para facilitar el clic
                 # Para blancas: zona superior (hasta el punto medio del área de bear off)
                 # Para negras: zona inferior (desde el punto medio del área de bear off)
                 mitad_y = self.y_bear + self.alto_tablero // 2
-                
+
                 if color == "white":
                     # Área ampliada: desde el inicio hasta un poco más allá de la mitad
                     # para incluir el círculo verde que está en y_bear + alto_tablero // 4
@@ -1009,42 +1122,42 @@ class TableroBackgammon:
         """Verifica si el clic fue en la barra central."""
         if not self.juego:
             return False
-            
+
         # Verificar si el jugador actual tiene fichas en la barra
         jugador_actual = self.juego.get_current_player()
         color_jugador = jugador_actual.get_color()
         board = self.juego.get_board()
-        
+
         if not board.bar[color_jugador]:
             return False
-            
+
         # Verificar si el clic está en el área de la barra
         barra_x_centro = self.x_tablero + self.ancho_tablero // 2
         barra_y_centro = self.y_tablero + self.alto_tablero // 2
-        
+
         # Área de clic en la barra (más amplia para facilitar el clic)
         area_clic = 50
-        
-        return (abs(x - barra_x_centro) < area_clic and 
+
+        return (abs(x - barra_x_centro) < area_clic and
                 abs(y - barra_y_centro) < area_clic)
 
     def _puede_seleccionar_punto(self, punto_idx: int) -> bool:
         """Verifica si el punto puede ser seleccionado por el jugador actual."""
         if not self.juego:
             return False
-            
+
         # Si el jugador tiene fichas en la barra, debe moverlas primero
         jugador_actual = self.juego.get_current_player()
         color_jugador = jugador_actual.get_color()
         board = self.juego.get_board()
-        
+
         if board.bar[color_jugador]:
             return False  # No puede seleccionar fichas normales si tiene fichas en la barra
-            
+
         # Verificar que el punto tenga fichas
         if not board.points[punto_idx]:
             return False
-            
+
         # Verificar que la primera ficha pertenezca al jugador actual
         primera_ficha = board.points[punto_idx][0]
         return primera_ficha.get_owner() == jugador_actual
@@ -1070,7 +1183,7 @@ class TableroBackgammon:
             pygame.display.flip()
             reloj.tick(60)
 
-        pygame.quit()  # type: ignore
+        pygame.quit()  # pylint: disable=no-member
 
 
 def main() -> None:
