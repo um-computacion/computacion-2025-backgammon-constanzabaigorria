@@ -206,28 +206,29 @@ class TestBoard(unittest.TestCase):
     def test_board_is_in_home_board_white_true(self):
         self.assertTrue(self.__board__.is_in_home_board(19, self.__player1__))
         self.assertTrue(self.__board__.is_in_home_board(23, self.__player1__))
+        self.assertTrue(self.__board__.is_in_home_board(24, self.__player1__))  # Incluir punto 24
 
     def test_board_is_in_home_board_white_false(self):
-        self.assertFalse(self.__board__.is_in_home_board(18, self.__player1__))
-        self.assertFalse(self.__board__.is_in_home_board(0, self.__player1__))
+        self.assertFalse(self.__board__.is_in_home_board(18, self.__player1__))  # Punto 18 está fuera
+        self.assertFalse(self.__board__.is_in_home_board(1, self.__player1__))  # Cambiar 0 por 1 (puntos 1-based)
 
     def test_board_is_in_home_board_black_true(self):
-        self.assertTrue(self.__board__.is_in_home_board(0, self.__player2__))
-        self.assertTrue(self.__board__.is_in_home_board(5, self.__player2__))
+        self.assertTrue(self.__board__.is_in_home_board(1, self.__player2__))  # Punto 1
+        self.assertTrue(self.__board__.is_in_home_board(6, self.__player2__))  # Punto 6
 
     def test_board_is_in_home_board_black_false(self):
-        self.assertFalse(self.__board__.is_in_home_board(6, self.__player2__))
+        self.assertFalse(self.__board__.is_in_home_board(7, self.__player2__))  # Punto 7 está fuera
         self.assertFalse(self.__board__.is_in_home_board(23, self.__player2__))
 
     def test_board_can_bear_off_true(self):
-        for i in range(19, 24):
+        for i in range(18, 24):  # Home board de blancas: índices 18-23 (puntos 19-24)
             checker = Checker(self.__player1__)
             self.__board__.add_checker_to_point(i, checker)
         self.assertTrue(self.__board__.can_bear_off(self.__player1__))
 
     def test_board_can_bear_off_false_checkers_outside_home(self):
         checker = Checker(self.__player1__)
-        self.__board__.add_checker_to_point(18, checker)
+        self.__board__.add_checker_to_point(17, checker)  # Fuera del home board (home board: índices 18-23)
         self.assertFalse(self.__board__.can_bear_off(self.__player1__))
 
     def test_board_can_bear_off_false_checkers_on_bar(self):

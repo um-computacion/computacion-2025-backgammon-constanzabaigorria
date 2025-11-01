@@ -105,16 +105,17 @@ class Board:
 
     def add_checker_to_bar(self, checker: Checker) -> None:
         """Agrega una ficha a la barra."""
-        owner = checker.get_owner()
-        if owner not in self.bar:
-            self.bar[owner] = []
-        self.bar[owner].append(checker)
+        color = checker.get_color()
+        if color not in self.bar:
+            self.bar[color] = []
+        self.bar[color].append(checker)
 
     def remove_checker_from_bar(self, player: Player) -> Checker:
         """Remueve una ficha de la barra del jugador."""
+        color = player.get_color()
         if self.get_bar_checkers_count(player) == 0:
             raise ValueError("No hay fichas en la barra")
-        return self.bar[player].pop()
+        return self.bar[color].pop()
 
     def has_checkers_on_bar(self, player: Player) -> bool:
         """Indica si el jugador tiene fichas en la barra."""
@@ -148,10 +149,14 @@ class Board:
         return 23 - point
 
     def is_in_home_board(self, point: int, player: Player) -> bool:
-        """Indica si el punto está en la zona de casa del jugador."""
+        """Indica si el punto está en la zona de casa del jugador.
+        
+        Args:
+            point: Número de punto (1-based: 1-24)
+        """
         if player.get_color() == "white":
-            return 19 <= point <= 23
-        return 0 <= point <= 5
+            return 19 <= point <= 24  # Puntos 19-24 (home board de blancas)
+        return 1 <= point <= 6  # Puntos 1-6 (home board de negras)
 
     def can_bear_off(self, player: Player) -> bool:
         """Indica si el jugador puede sacar fichas del tablero."""

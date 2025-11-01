@@ -396,6 +396,8 @@ class TestBackgammonGame(unittest.TestCase):
     def test_game_move_sequence_integration(self):
         self.__game__.start_game()
         initial_player = self.__game__.get_current_player()
+        # start_game() resetea los dados, así que hay que lanzarlos
+        self.__game__.roll_dice()
         self.assertTrue(self.__game__.has_dice_been_rolled())
         self.__game__.end_turn()
         final_player = self.__game__.get_current_player()
