@@ -109,3 +109,43 @@ Se actualizó la documentación completa del proyecto:
 
 Se completó la documentación de todos los prompts y cambios realizados en el proyecto Backgammon.
 
+## Prompt [4]
+
+**Fecha**: 01-11-2025  
+**Modelo/Herramienta**: Claude Sonnet 4  
+**Contexto**: completar archivo JUSTIFICACION.md con todos los requisitos académicos
+
+## Prompt enviado
+
+comleta el archivo de @JUSTIFICACION.md con esto: 
+Contenido mínimo:
+Resumen del diseño general.
+Justificación de las clases elegidas (por qué, responsabilidades).
+Justificación de atributos (por qué se eligieron).
+Decisiones de diseño relevantes
+Excepciones y manejo de errores (qué excepciones definidas y por qué).
+Estrategias de testing y cobertura (qué se probó y por qué).
+Referencias a requisitos SOLID y cómo se cumplen.
+Anexos: diagramas UML(ej: diagrama de clases).
+
+
+### Respuesta recibida
+
+Se completó el archivo `JUSTIFICACION.md` con todos los requisitos académicos especificados:
+- **Resumen del diseño general**: Arquitectura modular por capas con diagrama y justificación
+- **Justificación de las clases elegidas**: Análisis detallado de cada clase (Player, Checker, Board, Dice, BackgammonGame) incluyendo responsabilidades y razones de elección
+- **Justificación de atributos**: Tablas completas con atributos, tipos y justificación de cada decisión de diseño
+- **Decisiones de diseño relevantes**: Explicación de 5 decisiones clave (encapsulación, representación del tablero, separación de estado, type hints, validación)
+- **Excepciones y manejo de errores**: Lista completa de todas las excepciones `ValueError` definidas en cada clase, con justificación y estrategias de manejo
+- **Estrategias de testing y cobertura**: Metodología TDD, tipos de tests implementados, cobertura alcanzada (>90%), y tabla de funcionalidades probadas
+- **Referencias a requisitos SOLID**: Análisis detallado de cada principio (SRP, OCP, LSP, ISP, DIP) con ejemplos de código y tabla de cumplimiento
+- **Anexos con diagramas UML**: 
+  - Diagrama de clases completo con todos los atributos y métodos
+  - Relaciones entre clases (agregación, composición, dependencia)
+
+El documento tiene más de 700 líneas y cumple completamente con los requisitos académicos para justificación de diseño.
+
+### Uso de la respuesta
+
+El archivo `JUSTIFICACION.md` ahora está completo y listo para presentación académica, documentando exhaustivamente el diseño del proyecto Backgammon siguiendo todos los estándares requeridos.
+
