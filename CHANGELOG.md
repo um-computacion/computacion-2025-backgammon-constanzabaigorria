@@ -1,7 +1,7 @@
 # Changelog
 Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [1.0.0] – 2025-11-01
 
 ### Added
 - Se implementó bear off (retirar fichas) en la lógica del juego
