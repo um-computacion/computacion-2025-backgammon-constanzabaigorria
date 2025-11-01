@@ -126,7 +126,7 @@ class Checker:
         if not self.is_on_board():
             return False
         if self.get_color() == "white":
-            return 19 <= self.__position <= 23
+            return 18 <= self.__position <= 23
         else:
             return 0 <= self.__position <= 5
 
