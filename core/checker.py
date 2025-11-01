@@ -1,10 +1,21 @@
+"""
+Módulo que define la clase Checker para representar fichas del juego Backgammon.
+"""
 from typing import Optional
 from core.player import Player
+# pylint: disable=C0116  # many simple test methods without individual docstrings
 
 class Checker:
-
+    """
+    Representa una ficha del juego de Backgammon.
+    
+    Atributos:
+        __owner: El jugador propietario de la ficha
+        __position: Posición actual en el tablero (0-23) o None
+        __on_bar: Indica si la ficha está en la barra
+        __off_board: Indica si la ficha está fuera del tablero
+    """
     def __init__(self, owner: Player) -> None:
-       
         if owner is None:
             raise ValueError("El propietario no puede ser None")
         self.__owner: Player = owner
@@ -16,7 +27,6 @@ class Checker:
         return self.__owner
 
     def set_owner(self, owner: Player) -> None:
-     
         if owner is None:
             raise ValueError("El propietario no puede ser None")
         self.__owner = owner
@@ -108,17 +118,15 @@ class Checker:
         self.move_to_bar()
 
     def reset_position(self) -> None:
- 
         self.__position = None
         self.__on_bar = False
         self.__off_board = False
 
     def is_in_home_board(self) -> bool:
-  
         if not self.is_on_board():
             return False
         if self.get_color() == "white":
-            return 19 <= self.__position <= 23
+            return 18 <= self.__position <= 23
         else:
             return 0 <= self.__position <= 5
 
@@ -155,7 +163,12 @@ class Checker:
         return new_checker
 
     def __str__(self) -> str:
+        """
+        Representación en string de la ficha.
 
+        Returns:
+            str: Representación legible de la ficha.
+        """
         pos = self.__position
         if self.__on_bar:
             pos_str = "BAR"
@@ -163,17 +176,30 @@ class Checker:
             pos_str = "OFF"
         else:
             pos_str = str(pos) if pos is not None else "None"
-        return f"Checker(owner={self.__owner.get_name()}, color={self.get_color()}, position={pos_str})"
+        return (
+            f"Checker(owner={self.__owner.get_name()}, "
+            f"color={self.get_color()}, position={pos_str})"
+        )
 
     def __eq__(self, other: object) -> bool:
+        """
+        Compara dos instancias de Checker.
 
+        Args:
+            other (object): Otra instancia para comparar.
+
+        Returns:
+            bool: True si ambas fichas son equivalentes, False en caso contrario.
+        """
         if not isinstance(other, Checker):
             return False
-        return (self.__owner == other.__owner and
-                self.__position == other.__position and
-                self.__on_bar == other.__on_bar and
-                self.__off_board == other.__off_board)
+        # Comparación usando getters para respetar el encapsulamiento
+        return (
+            self.get_owner() == other.get_owner() and
+            self.get_position() == other.get_position() and
+            self.is_on_bar() == other.is_on_bar() and
+            self.is_off_board() == other.is_off_board()
+        )
 
     def __hash__(self) -> int:
-
         return hash((self.__owner, self.__position, self.__on_bar, self.__off_board))
